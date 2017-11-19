@@ -94,4 +94,65 @@ Check DECCipher.pas for more details on these modes.
 * Escaped Strings
 
  ## Usage examples
- TODO
+ ### AES-CBC-128 encode/decode example:
+ ```
+const
+  STATIC_KEY: array[0..15] of Byte = (0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
+var
+  IV: array[0..15] of Byte;
+  Plaintext: Binary;
+  Ciphertext: TBytes;
+begin
+  RandomSeed;
+  Plaintext := 'abcdefghijklmnopqrstuvwxyz';
+  with TCipher_Rijndael.Create do
+    try
+      Mode := cmCBCx;
+      RandomBuffer(IV, 16);
+      Init(STATIC_KEY, 16, IV, 16); 
+      SetLength(Ciphertext, Length(Plaintext));
+      Encode(Plaintext[1], Ciphertext[0], Length(Plaintext));
+      Done; // only needed when same object will be used for further operations
+      FillChar(Plaintext[1], Length(Plaintext), 0);
+      Decode(Ciphertext[0], Plaintext[1], Length(Ciphertext));
+      Assert(Plaintext = 'abcdefghijklmnopqrstuvwxyz');
+    finally
+      Free;
+    end;
+end;
+```
+Note: If the plaintext isn't padded, DEC will pad the last truncated block with CFB8! PKCS padding is not supported by DEC. Using DEC in conjunction with other crypto libraries is of course possible, but you need to make sure to preprocess (i.e. pad) the plaintext properly.
+
+Also note: DEC's Binary type is defined as RawByteString. If you are in a unicode environment (e.g. Delphi 2009+), care is advised when dealing with variables of type ``string``. Never directly pass them into a function that takes Binary!
+
+### SHA-256 examples with formatting
+```
+var
+  InputBuf: TBytes;
+  InputRawStr, Hash: Binary;
+begin
+  SetLength(InputBuf, 4);
+  FillChar(InputBuf[0], 4, $AA);
+  Hash := THash_SHA256.CalcBuffer(InputBuf[0], 4, TFormat_MIME64);
+  // -> 2+0UzrAB0RDXZrkBPTtbv/rWkVR1qboHky0qwFeUTAQ=
+  InputRawStr := 'My message';
+  Hash := THash_SHA256.CalcBinary(InputRawStr, TFormat_HEXL);
+  // -> acc147c887e3b838ebf870c8779989fa8283eff5787b57f1acb35cac63244a81
+  Hash := THash_SHA256.CalcBinary(InputRawStr, TFormat_Copy);
+  // -> Hash contains ac c1 47 ... raw bytes. Can be copied to a 32 bytes array using Move(Hash[1], HashBytes[0], 32);
+end;
+```
+
+Each hash class also has functions called KDF2 and KDFx for key derivation (e.g. for use as session keys in ciphers).
+
+### Standalone formatting
+```
+  Writeln(TFormat_MIME64.Encode('My message'));
+  // -> TXkgbWVzc2FnZQ==
+  Writeln(TFormat_MIME64.Decode('TXkgbWVzc2FnZQ=='));
+  // -> My message
+  Writeln(TFormat_PGP.Encode('Hello, how are you today?'));
+  // -> SGVsbG8sIGhvdyBhcmUgeW91IHRvZGF5Pw== <line break> =nUAA  
+```
+
+Encode and Decode are both overloaded to also take an untyped input buffer.

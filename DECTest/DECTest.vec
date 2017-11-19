@@ -1,0 +1,648 @@
+# Delphi Encryption Compendium
+# Format Conversions Test Cases
+# 08.10.2003
+
+[TFormat_HEX]
+<>=<>
+<546573740A09AA55ABCDEF>=<Test\n\t\xAA\x55\xAB\xCD\xEF>
+
+[TFormat_HEXL]
+<>=<>
+<546573740a09aa55abcdef>=<Test\n\t\xAA\x55\xAB\xCD\xEF>
+
+[TFormat_MIME32]
+<>=<>
+<xk3gh4jbjsklf>=<Test\n\t\xAA\x55>
+<xk3gh4jbjsklfyc>=<Test\n\t\xAA\x55\xAA>
+<xk3gh4jbjsklfyzk>=<Test\n\t\xAA\x55\xAA\x55>
+<xk3gh4jbjsklfyzkkf>=<Test\n\t\xAA\x55\xAA\x55\xAA>
+<xk3gh4jbjsklfyzkkpya>=<Test\n\t\xAA\x55\xAA\x55\xAA\x55>
+
+[TFormat_MIME64]
+<>=<>
+<VGVzdAoJqlU=>=<Test\n\t\xAA\x55>
+<VGVzdAoJqlWq>=<Test\n\t\xAA\x55\xAA>
+<VGVzdAoJqlWqVQ==>=<Test\n\t\xAA\x55\xAA\x55>
+<VGVzdAoJqlWqVao=>=<Test\n\t\xAA\x55\xAA\x55\xAA>
+<VGVzdAoJqlWqVapV>=<Test\n\t\xAA\x55\xAA\x55\xAA\x55>
+
+[TFormat_PGP]
+<>=<>
+<VGVzdAoJqlU=\r\n=XtiM>=<Test\n\t\xAA\x55>
+<VGVzdAoJqlWq\r\n=qBH3>=<Test\n\t\xAA\x55\xAA>
+<VGVzdAoJqlWqVQ==\r\n=Rqc1>=<Test\n\t\xAA\x55\xAA\x55>
+<VGVzdAoJqlWqVao=\r\n=s2dH>=<Test\n\t\xAA\x55\xAA\x55\xAA>
+<VGVzdAoJqlWqVapV\r\n=WEFz>=<Test\n\t\xAA\x55\xAA\x55\xAA\x55>
+
+[TFormat_XX]
+<>=<>
+<6J4JnR+c7eZI+>=<Test\n\t\xAA\x55>
+<7J4JnR+c7eZKe>=<Test\n\t\xAA\x55\xAA>
+<8J4JnR+c7eZKeJE++>=<Test\n\t\xAA\x55\xAA\x55>
+<9J4JnR+c7eZKeJOc+>=<Test\n\t\xAA\x55\xAA\x55\xAA>
+<AJ4JnR+c7eZKeJOdJ>=<Test\n\t\xAA\x55\xAA\x55\xAA\x55>
+
+[TFormat_UU]
+<>=<>
+<(5&5S=`H)JE4`>=<Test\n\t\xAA\x55>
+<)5&5S=`H)JE6J>=<Test\n\t\xAA\x55\xAA>
+<*5&5S=`H)JE6J50``>=<Test\n\t\xAA\x55\xAA\x55>
+<+5&5S=`H)JE6J5:H`>=<Test\n\t\xAA\x55\xAA\x55\xAA>
+<,5&5S=`H)JE6J5:I5>=<Test\n\t\xAA\x55\xAA\x55\xAA\x55>
+
+[TFormat_Escape]
+<>=<>
+<Test\xAA\x55>=<Test\xAA\x55>
+
+# Delphi Encryption Compendium
+# Hash Algorithm Test Cases
+# 08.10.2003
+
+[THash_MD4]
+<31d6cfe0d16ae931b73c59d7e0c089c0>=<>
+<bde52cb31de33e46245e05fbdbd6fb24>=<a>
+<a448017aaf21d8525fc10ae87aa6729d>=<ab>,<c>
+<d9130a8164549fe818874806e1c7014b>=<message digest>
+<d79e1c308aa5bbcdeea8ed63df412da9>=<abcdefghijklm>,<nopqrstuvwxyz>
+<043f8582f241db351ce627e153e7f0e4>=<A>,<BCDEFGHIJKLMNOPQRS>,<TUVWXYZabcdefghijklmnopqrstuvwxyz012345678>,<9>
+<e33b4ddc9c38f2199c3e7b164fcc0536>=8<1234567890>
+<186767a4d851893b823e6824c6efda62>=<This test vector intended to detect last zeroized block necessity decision error. This block has total length 119 bytes>
+<adba72c3baf834d091eb59f18d022549>=<This test vector intended to detect last zeroized block necessity decision error. This block has total length 120 bytes.>
+# test repeated 15.625 times string aaa...
+<bbce80cc6bb65e5c6745e30d4eeca9a4>=15625<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+# test one string of 15.625 times concatenation of aaa..., eg. 1Mb
+<bbce80cc6bb65e5c6745e30d4eeca9a4>=15625!<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+
+[THash_MD5]
+<d41d8cd98f00b204e9800998ecf8427e>=<>
+<0cc175b9c0f1b6a831c399e269772661>=<a>
+<900150983cd24fb0d6963f7d28e17f72>=<ab>,<c>
+<f96b697d7cb7938d525a2f31aaf161d0>=<message digest>
+<c3fcd3d76192e4007dfb496cca67e13b>=<abcdefghijklm>,<nopqrstuvwxyz>
+<d174ab98d277d9f5a5611c2c9f419d9f>=<A>,<BCDEFGHIJKLMNOPQRS>,<TUVWXYZabcdefghijklmnopqrstuvwxyz012345678>,<9>
+<57edf4a22be3c955ac49da2e2107b67a>=8<1234567890>
+<e6810238956987dec0d7bfcbcd4caab8>=<This test vector intended to detect last zeroized block necessity decision error. This block has total length 119 bytes>
+<637d2777ed733d5d33b5bfc140f118c5>=<This test vector intended to detect last zeroized block necessity decision error. This block has total length 120 bytes.>
+<7707d6ae4e027c70eea2a935c2296f21>=15625<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+<7707d6ae4e027c70eea2a935c2296f21>=15625!<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+
+[THash_RipeMD128]
+<cdf26213a150dc3ecb610f18f6b38b46>=<>
+<86be7afa339d0fc7cfc785e72f578d33>=<a>
+<c14a12199c66e4ba84636b0f69144c77>=<ab>,<c>
+<9e327b3d6e523062afc1132d7df9d1b8>=<message digest>
+<fd2aa607f71dc8f510714922b371834e>=<abcdefghijklm>,<nopqrstuvwxyz>
+<a1aa0689d0fafa2ddc22e88b49133a06>=<abcdbcdecdefdefg>,<efghfghighijhijki>,<jkljklmklmnlmnomnopnopq>
+<d1e959eb179c911faea4624c60c5c702>=<ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345678>,<9>
+<3f45ef194732c2dbb2c4a2c769795fa3>=8<1234567890>
+<a4137d8c40fa51152905b3747acc0ff4>=<This test vector intended to detect last zeroized block necessity decision error. This block has total length 119 bytes>
+<243988f60681af64730a7ee6b5f0406b>=<This test vector intended to detect last zeroized block necessity decision error. This block has total length 120 bytes.>
+<4a7f5723f954eba1216c9d8f6320431f>=15625<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+<4a7f5723f954eba1216c9d8f6320431f>=15625!<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+
+[THash_RipeMD160]
+<9c1185a5c5e9fc54612808977ee8f548b2258d31>=<>
+<0bdc9d2d256b3ee9daae347be6f4dc835a467ffe>=<a>
+<8eb208f7e05d987a9b044a8e98c6b087f15a0bfc>=<ab>,<c>
+<5d0689ef49d2fae572b881b123a85ffa21595f36>=<message digest>
+<f71c27109c692c1b56bbdceb5b9d2865b3708dbc>=<abcdefghijklm>,<nopqrstuvwxyz>
+<12a053384a9c0c88e405a06c27dcf49ada62eb2b>=<abcdbcdecdefdefgefg>,<hfghighijhijki>,<jkljklmklmnlmnomnopnopq>
+<b0e20b6e3116640286ed3a87a5713079b21f5189>=<ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz012345678>,<9>
+<9b752e45573d4b39f4dbd3323cab82bf63326bfb>=8<1234567890>
+<b8c681512ad02967243bb93d181b5783eb501f2f>=<This test vector intended to detect last zeroized block necessity decision error. This block has total length 119 bytes>
+<e94a9d107e49e4ea81b22cfaa4075437175d383c>=<This test vector intended to detect last zeroized block necessity decision error. This block has total length 120 bytes.>
+<52783243c1697bdbe16d37f97f68f08325dc1528>=15625<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+<52783243c1697bdbe16d37f97f68f08325dc1528>=15625!<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+
+[THash_RipeMD256]
+<02ba4c4e5f8ecd1877fc52d64d30e37a2d9774fb1e5d026380ae0168e3c5522d>=<>
+<f9333e45d857f5d90a91bab70a1eba0cfb1be4b0783c9acfcd883a9134692925>=<a>
+<afbd6e228b9d8cbbcef5ca2d03e6dba10ac0bc7dcbe4680e1e42d2e975459b65>=<abc>
+<87e971759a1ce47a514d5c914c392c9018c7c46bc14465554afcdf54a5070c0e>=<message digest>
+<649d3034751ea216776bf9a18acc81bc7896118a5197968782dd1fd97d8d5133>=<abcdefghijklmnopqrstuvwxyz>
+<3843045583aac6c8c8d9128573e7a9809afb2a0f34ccc36ea9e72f16f6368e3f>=<abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq>
+<5740a408ac16b720b84424ae931cbb1fe363d1d0bf4017f1a89f7ea6de77a0b8>=<ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789>
+<06fdcc7a409548aaf91368c06a6275b553e3f099bf0ea4edfd6778df89a890dd>=8<1234567890>
+<ce2a12e4361b03bf914ce35267628a9f26d54ed82b764c903958f29e652e0f5d>=<This test vector intended to detect last zeroized block necessity decision error. This block has total length 119 bytes>
+<5b622dfcf325aa4476bcdeff971f961120a19bf7642b85cbdd422f46d7c7bad8>=<This test vector intended to detect last zeroized block necessity decision error. This block has total length 120 bytes.>
+<ac953744e10e31514c150d4d8d7b677342e33399788296e43ae4850ce4f97978>=15625<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+<ac953744e10e31514c150d4d8d7b677342e33399788296e43ae4850ce4f97978>=15625!<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+
+[THash_RipeMD320]
+<22d65d5661536cdc75c1fdf5c6de7b41b9f27325ebc61e8557177d705a0ec880151c3a32a00899b8>=<>
+<ce78850638f92658a5a585097579926dda667a5716562cfcf6fbe77f63542f99b04705d6970dff5d>=<a>
+<de4c01b3054f8930a79d09ae738e92301e5a17085beffdc1b8d116713e74f82fa942d64cdbc4682d>=<abc>
+<3a8e28502ed45d422f68844f9dd316e7b98533fa3f2a91d29f84d425c88d6b4eff727df66a7c0197>=<message digest>
+<cabdb1810b92470a2093aa6bce05952c28348cf43ff60841975166bb40ed234004b8824463e6b009>=<abcdefghijklmnopqrstuvwxyz>
+<d034a7950cf722021ba4b84df769a5de2060e259df4c9bb4a4268c0e935bbc7470a969c9d072a1ac>=<abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq>
+<ed544940c86d67f250d232c30b7b3e5770e0c60c8cb9a4cafe3b11388af9920e1b99230b843c86a4>=<ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789>
+<557888af5f6d8ed62ab66945c6d2a0a47ecd5341e915eb8fea1d0524955f825dc717e4a008ab2d42>=8<1234567890>
+<83254b7c45b10b0f1c7cd9d6bdf1c318d4e807731b7ce21b348ac0ee17e4ee7feb1f49fc3aea7d16>=<This test vector intended to detect last zeroized block necessity decision error. This block has total length 119 bytes>
+<77d7e20be0672bc74ed1cb4d9f56cf455c5e86a045c18db84e2d7bba53b21788575d6d7baa3d3469>=<This test vector intended to detect last zeroized block necessity decision error. This block has total length 120 bytes.>
+<bdee37f4371e20646b8b0d862dda16292ae36f40965e8c8509e63d1dbddecc503e2b63eb9245bb66>=15625<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+<bdee37f4371e20646b8b0d862dda16292ae36f40965e8c8509e63d1dbddecc503e2b63eb9245bb66>=15625!<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+
+[THash_SHA]
+<0164b8a914cd2a5e74c4f7ff082c4d97f1edf880>=<abc>
+<d2516ee1acfa5baf33dfc1c471e438449ef134c8>=<abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq>
+<f79e92290e9f519a62467812ea56920850354796>=<This test vector intended to detect last zeroized block necessity decision error. This block has total length 119 bytes>
+<e644dc674505c8260e58e32f6b8bcf565b2fafc4>=<This test vector intended to detect last zeroized block necessity decision error. This block has total length 120 bytes.>
+<3232affa48628a26653b5aaa44541fd90d690603>=15625<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+<3232affa48628a26653b5aaa44541fd90d690603>=15625!<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+
+[THash_SHA1]
+<a9993e364706816aba3e25717850c26c9cd0d89d>=<ab>,<c>
+<84983e441c3bd26ebaae4aa1f95129e5e54670f1>=<abcdbcdecdefdef>,<gefghfghighijhijki>,<jkljklmklmnlmnomnopnop>,<q>
+<c464f3b38d34f7bf49b29635e50c8957b3a87dc7>=<This test vector intended to detect last zeroized block necessity decision error. This block has total length 119 bytes>
+<df2724a78d507fbfb4b85aa328cf8221e10f74a7>=<This test vector intended to detect last zeroized block necessity decision error. This block has total length 120 bytes.>
+<34aa973cd4c4daa4f61eeb2bdbad27316534016f>=15625<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+<34aa973cd4c4daa4f61eeb2bdbad27316534016f>=15625!<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+
+[THash_SHA256]
+<ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad>=<ab>,<c>
+<248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1>=<abcdbcdecdefdef>,<gefghfghighijhijki>,<jkljklmklmnlmnomnopnop>,<q>
+<85c0f2421bdffd1dc9568cd815175fe286e5c18a4c4e0308114f534442c6dc3c>=<This test vector intended to detect last zeroized block necessity decision error. This block has total length 119 bytes>
+<c8a0bcda5fec642e44488fd7b782821d478ef17e651eaec0e43f9036388340bb>=<This test vector intended to detect last zeroized block necessity decision error. This block has total length 120 bytes.>
+
+[THash_SHA384]
+<cb00753f45a35e8bb5a03d699ac65007272c32ab0eded1631a8b605a43ff5bed8086072ba1e7cc2358baeca134c825a7>=<abc>
+<09330c33f71147e83d192fc782cd1b4753111b173b3b05d22fa08086e3b0f712fcc7c71a557e2db966c3e9fa91746039>=<abcdefghbcdefghicdefghijdefghij>,<kefghijklfghijklmghijklmn>,<hijklmnoijklmnopjklmnopqklmnopqrlmnopqr>,<smnopqrstnopqrst>,<u>
+<cdbb41d1164ef06788b8b3f0fcb157de981311f0bc76752c952075fcb14d1c133b27ddc7ad6b6b8c180346d0fe18694b>=<This test vector intended to detect last zeroized block necessity decision error. It has total length 111 bytes>
+<49b8d662fc136462591f9a96a64d28ea8fb03b7b943dd3400f2633effcab37502927736f19bdeecce842801f41ab3e26>=<This test vector intended to detect last zeroized block necessity decision error. It has total length 112 bytes.>
+
+[THash_SHA512]
+<ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f>=<ab>,<c>
+<8e959b75dae313da8cf4f72814fc143f8f7779c6eb9f7fa17299aeadb6889018501d289e4900f7e4331b99dec4b5433ac7d329eeb6dd26545e96e55b874be909>=<abcdefghbcdefghicdefghijdefghij>,<kefghijklfghijklmghijklmn>,<hijklmnoijklmnopjklmnopqklmnopqrlmnopqr>,<smnopqrstnopqrst>,<u>
+<b4dd09998c54420c9445fb0706715f595435880da13fc56d2f55b47a86cd9e59a5ee9564f3bc8e91ed9ab6b2a5db2561a3bd56e21defda4faf831da96210104d>=<This test vector intended to detect last zeroized block necessity decision error. It has total length 111 bytes>
+<ad80509dcad277f40647311294f9b007165ae8456829d4befdfd0de536c05c8ceec7dbe6d9dac88578fa3037d37b81382c0ae14c2fd9388fde50105ad1d7d993>=<This test vector intended to detect last zeroized block necessity decision error. It has total length 112 bytes.>
+
+[THash_Haval128]
+.PaddingByte=128
+<1bdc556b29ad02ec09af8c66477f2a87>=<>
+<24d2bc955a219e3e06462c91b555cfa1>=<a>
+<16c743e5eefd3266ed50deac6c30313e>=<HAVAL>
+<82d163440f6e853229a97007ec4af0e5>=<0123456789>
+<92e8ec9ad7fd209d97e9ce21b50440e9>=<abcdefghijklm>,<nopqrstuvwxyz>
+<4ae2f37cef9275cce0d73f6a1eb9cdd8>=<ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789>
+<3e1846cda3c9542944672b7150d0f38c>=<This test vector intended to detect last zeroized block necessity decision error. For this detection it is 117 bytes.>
+<41b74ec225c9fb7a8e24840a98141b39>=15625<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+<41b74ec225c9fb7a8e24840a98141b39>=15625!<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+.PaddingByte=1
+<c68f39913f901f3ddf44c707357a7d70>=<>
+<0cd40739683e15f01ca5dbceef4059f1>=<a>
+<dc1f3c893d17cc4edd9ae94af76a0af0>=<HAVAL>
+<d4be2164ef387d9f4d46ea8efb180cf5>=<0123456789>
+<dc502247fb3eb8376109eda32d361d82>=<abcdefghijklm>,<nopqrstuvwxyz>
+<de5eb3f7d9eb08fae7a07d68e3047ec6>=<ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789>
+<4806b64dae93d3606308310a439e2a3a>=<This test vector intended to detect last zeroized block necessity decision error. For this detection it is 117 bytes.>
+<8beaa7dd5bb591c8009e429d79041813>=15625<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+<8beaa7dd5bb591c8009e429d79041813>=15625!<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+
+[THash_Haval160]
+.PaddingByte=128
+<fe79d0a044ffb75d5354668d664e4f4b9cc33477>=<>
+<5e1610fced1d3adb0bb18e92ac2b11f0bd99d8ed>=<a>
+<8e568ad6ccd58d17e0a11e92183232e0d1d2e9bf>=<HAVAL>
+<700d43a9b5e38300303fd4e25a6a326beb4a2241>=<0123456789>
+<1dd40aeab9610585fcae7492ff3b893c2a018f4e>=<abcdefghijklmnopqrstuvwxyz>
+<485abb76ed2f5ac8bb86ddeb8cb4c54cf5bb077b>=<ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789>
+<7e3ec827726ae5ce4f4f67614395aa1c0602551a>=<This test vector intended to detect last zeroized block necessity decision error. For this detection it is 117 bytes.>
+<687e9073f7ec5f01ea4744b86ef40e13aaacf0a4>=15625<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+<687e9073f7ec5f01ea4744b86ef40e13aaacf0a4>=15625!<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+.PaddingByte=1
+<d353c3ae22a25401d257643836d7231a9a95f953>=<>
+<4da08f514a7275dbc4cece4a347385983983a830>=<a>
+<8822bc6f3e694e73798920c77ce3245120dd8214>=<HAVAL>
+<be68981eb3ebd3f6748b081ee5d4e1818f9ba86c>=<0123456789>
+<eba9fa6050f24c07c29d1834a60900ea4e32e61b>=<abcdefghijklmnopqrstuvwxyz>
+<97dc988d97caae757be7523c4e8d4ea63007a4b9>=<ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789>
+<ba27e0d51b9ba140804252413c52b42dfe97214b>=<This test vector intended to detect last zeroized block necessity decision error. For this detection it is 117 bytes.>
+<5ea7fa9a0236aad66a1da8f161985c6e3dae2b81>=15625<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+<5ea7fa9a0236aad66a1da8f161985c6e3dae2b81>=15625!<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+
+[THash_Haval192]
+.PaddingByte=128
+<51fa9e28c96865207ed6dae2eaa1d8af6e7de2783ebec4b4>=<>
+<a1446e6cedb4b28bc6e13d4d1d2694e9ce4a3d942c73589e>=<a>
+<74aa31182ff09bcce453a7f71b5a7c5e80872fa90cd93ae4>=<HAVAL>
+<ca05546ffa4b69dafa7c04424cc10802a2523efcb8bebb61>=<0123456789>
+<5a238735d9e902e16cad81229cc981a763508c73f4a52dd0>=<abcdefghijklmnopqrstuvwxyz>
+<d51d73eb03b0d841c24f2007aa9159f0f70a971cbfbed33c>=<ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789>
+<1cee084b711ef399076a4cfa095a81dc6e1667f3c8207204>=<This test vector intended to detect last zeroized block necessity decision error. For this detection it is 117 bytes.>
+<f5608294798348bfa3fc45f72954a0e980b15804b4c56674>=15625<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+<f5608294798348bfa3fc45f72954a0e980b15804b4c56674>=15625!<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+.PaddingByte=1
+<4a8372945afa55c7dead800311272523ca19d42ea47b72da>=<>
+<856c19f86214ea9a8a2f0c4b758b973cce72a2d8ff55505c>=<a>
+<0c1396d7772689c46773f3daaca4efa982adbfb2f1467eea>=<HAVAL>
+<c3a5420bb9d7d82a168f6624e954aaa9cdc69fb0f67d785e>=<0123456789>
+<2e2e581d725e799fda1948c75e85a28cfe1cf0c6324a1ada>=<abcdefghijklmnopqrstuvwxyz>
+<e5c9f81ae0b31fc8780fc37cb63bb4ec96496f79a9b58344>=<ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789>
+<8c80602a16fcca8332c08446ea61a2fbc74e05d3361f0e4d>=<This test vector intended to detect last zeroized block necessity decision error. For this detection it is 117 bytes.>
+<aa15056802a32823332dd551ebe3e39918d6bc9e1fa293b1>=15625<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+<aa15056802a32823332dd551ebe3e39918d6bc9e1fa293b1>=15625!<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+
+[THash_Haval224]
+.PaddingByte=128
+<aacd8950b239b05e8a40a0419afd3bbed206623913d8a6dfe71d174b>=<>
+<54a26096c951725228d34a1b55c2db5c28446e6b243fe2ae78623a4b>=<a>
+<f9040eebae11709245501beffb5fb849f88a9086f24df3a55a03a01a>=<HAVAL>
+<144cb2de11f05df7c356282a3b485796da653f6b702868c7dcf4ae76>=<0123456789>
+<fbb63f06592fb9aa4f59652b99bc53c1ff72675726c71326c682dabc>=<abcdefghijklmnopqrstuvwxyz>
+<1120b26105044df0b4e5b904705f3b8cbbc14a52b73301c300baff8a>=<ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789>
+<752a1ee3fc2185888a421e148d6a3b8fb33ac20ba0668598c11d755a>=<This test vector intended to detect last zeroized block necessity decision error. For this detection it is 117 bytes.>
+<aff21cea7b3294dd02e6de843650fe82eb51cdd1e9d8873b13834717>=15625<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+<aff21cea7b3294dd02e6de843650fe82eb51cdd1e9d8873b13834717>=15625!<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+.PaddingByte=1
+<3e56243275b3b81561750550e36fcd676ad2f5dd9e15f2e89e6ed78e>=<>
+<742f1dbeeaf17f74960558b44f08aa98bdc7d967e6c0ab8f799b3ac1>=<a>
+<85538ffc06f3b1c693c792c49175639666f1dde227da8bd000c1e6b4>=<HAVAL>
+<bebd7816f09baeecf8903b1b9bc672d9fa428e462ba699f814841529>=<0123456789>
+<a0ac696cdb2030fa67f6cc1d14613b1962a7b69b4378a9a1b9738796>=<abcdefghijklmnopqrstuvwxyz>
+<3e63c95727e0cd85d42034191314401e42ab9063a94772647e3e8e0f>=<ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789>
+<adf788362468585753a4ebb59c44c8934d2995c6305beb9345ddf485>=<This test vector intended to detect last zeroized block necessity decision error. For this detection it is 117 bytes.>
+<0d53e2e5e768707ab94070f6f9b8accd9ad831076780443a2e659fdc>=15625<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+<0d53e2e5e768707ab94070f6f9b8accd9ad831076780443a2e659fdc>=15625!<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+
+[THash_Haval256]
+.PaddingByte=128
+<5981d3f8cce7f5674752595f4ad24c184ba1c738c986d4d2eddf2bd86c3f8679>=<>
+<166f2218e0994a78ebad3feab0211b612b14e93e5cceb60e6f143df0fa166d39>=<a>
+<217bfdf84f5c775596c2f13ceea7417cd4e198d53ca24902f9717585ec5789ac>=<HAVAL>
+<a6828eeb82d5a9cbfc7c522ad4b3c38a42753deceb20fb3a6fabc0da8ccd6a1a>=<0123456789>
+<1a1dc8099bdaa7f35b4da4e805f1a28fee909d8dee920198185cbcaed8a10a8d>=<ab>,<cdefghijklmnopqrstuvwxyz>
+<c5647fc6c1877fff96742f27e9266b6874894f41a08f5913033d9d532aeddb39>=<ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefg>,<hijklmnopqrstuvwxyz012345678>,<9>
+<88c8334686f5ae277de90a2267c7e52ec6e2fe708eedb067d136e046613f2253>=2<ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567899876543210>
+<7da3e3411ae031fa241e6f2f7deaf62827e8e97a2865ce5c1b67da2b6065efe4>=<This test vector intended to detect last zeroized block necessity decision error. For this detection it is 117 bytes.>
+<6d0efcb27421a2c45c14dd66f5de5e289893360ca2089c26ef491c01bd94b21a>=15625<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+<6d0efcb27421a2c45c14dd66f5de5e289893360ca2089c26ef491c01bd94b21a>=15625!<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+.PaddingByte=1
+<be417bb4dd5cfb76c7126f4f8eeb1553a449039307b1a3cd451dbfdc0fbbe330>=<>
+<de8fd5ee72a5e4265af0a756f4e1a1f65c9b2b2f47cf17ecf0d1b88679a3e22f>=<a>
+<153d2c81cd3c24249ab7cd476934287af845af37f53f51f5c7e2be99ba28443f>=<HAVAL>
+<357e2032774abbf5f04d5f1dec665112ea03b23e6e00425d0df75ea155813126>=<0123456789>
+<c9c7d8afa159fd9e965cb83ff5ee6f58aeda352c0eff005548153a61551c38ee>=<ab>,<cdefghijklmnopqrstuvwxyz>
+<b45cb6e62f2b1320e4f8f1b0b273d45add47c321fd23999dcf403ac37636d963>=<ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefg>,<hijklmnopqrstuvwxyz012345678>,<9>
+<42bb773476b0e978e7fa7414b2e7ecf0dc0a2accb96ade5d815d0e4706969272>=2<ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567899876543210>
+<e7467dad3b4f59c182a7869816ec15c8b59e4c5038ff5afbff60e6d44041a670>=<This test vector intended to detect last zeroized block necessity decision error. For this detection it is 117 bytes.>
+<3f2be6dd53dc7944290e8939192bcccc8077c99b622e0c20355942dd6a4ec009>=15625<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+<3f2be6dd53dc7944290e8939192bcccc8077c99b622e0c20355942dd6a4ec009>=15625!<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+
+[THash_Tiger]
+.Rounds=3
+<3293ac630c13f0245f92bbb1766e16167a4e58492dde73f3>=<>
+<2aab1484e8c158f2bfb8c5ff41b57a525129131c957b5f93>=<ab>,<c>
+<dd00230799f5009fec6debc838bb6a27df2b9d6f110c7937>=<Tiger>
+<f71c8583902afb879edfe610f82c0d4786a3a534504486b5>=<ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefg>,<h>,<ijklmnopqrstuvwxyz0123456789+->
+<48ceeb6308b87d46e95d656112cdf18d97915f9765658957>=<ABCDEFGHIJKLMNOPQRSTUVWXYZ=abcdefghijklmnopqrstuvwxyz+012345678>,<9>
+<8a866829040a410c729ad23f5ada711603b3cdd357e4c15e>=<Tiger - A Fast New Hash Function, by Ross Anderson and Eli Biham>
+<ce55a6afd591f5ebac547ff84f89227f9331dab0b611c889>=<Tiger - A Fast New Hash Function, by Ross Anderson and Eli Biham, proceedings of Fast Software Encryption 3, Cambridge.>
+<631abdd103eb9a3d245b6dfd4d77b257fc7439501d1568dd>=<Tiger - A Fast New Hash Function, by Ross Anderson and Eli Biham, proceedings of Fast Software Encryption 3, Cambridge, 1996.>
+<c54034e5b43eb8005848a7e0ae6aac76e4ff590ae715fd25>=2<ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+->
+.Rounds=4
+<24cc78a7f6ff3546e7984e59695ca13d804e0b686e255194>=<>
+<538883c8fc5f28250299018e66bdf4fdb5ef7b65f2e91753>=<ab>,<c>
+<aee020507279c0d2defcb767251cc0f824bbe38569d58ee4>=<Tiger>
+<439c699b3ca4f2d0cedc940fabca8941932a729a91950710>=<ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefg>,<h>,<ijklmnopqrstuvwxyz0123456789+->
+<c5fe245ba8e9e3a056efd9f6cfa79cead8571a3c87fe62f1>=<ABCDEFGHIJKLMNOPQRSTUVWXYZ=abcdefghijklmnopqrstuvwxyz+012345678>,<9>
+<81100cdf2076b0e0392004f703449f41a37b840437b643ff>=<Tiger - A Fast New Hash Function, by Ross Anderson and Eli Biham>
+<a1e027aa525a38589ac97cfa325dc08417b3445ab3c27452>=<Tiger - A Fast New Hash Function, by Ross Anderson and Eli Biham, proceedings of Fast Software Encryption 3, Cambridge.>
+<f72ca9fa0db3332782d7b8ccac29575490b8100803212003>=<Tiger - A Fast New Hash Function, by Ross Anderson and Eli Biham, proceedings of Fast Software Encryption 3, Cambridge, 1996.>
+<653b3075f1a85c6c74f1a9090b3c46239f29f0f92358e4e3>=2<ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+->
+
+[THash_Panama]
+<aa0cc954d757d7ac7779ca3342334ca471abd47d5952ac91ed837ecd5b16922b>=<>
+<a2a70386b81fb918be17f00ff3e3b376a0462c4dc2eec7f2c63202c8874c037d>=<abc>
+<8f3c497bb2cc4ee1c09f025bd72effef2689e5ade788e5b633c31f7e18c53fec>=<0123456789abcdeffedcba987654321>
+<e7742dcf637952e28af6a4f55ab98f70285093162062a73a0baad08f579e83b3>=<0123456789abcdeffedcba9876543210>
+<5f5ca355b90ac622b0aa7e654ef5f27e9e75111415b48b8afe3add1c6b89cba1>=<The quick brown fox jumps over the lazy dog>
+<63a7a70172f9f1896a8b636f50e7a3950a63fe7ecac9de0441d9f75b8377f664>=17!<0123456789abcdeffedcba9876543210>
+<f5f407b0987499b2af57b19fa63d92fc88a217b08a6928ab521c720a04be6825>=10!<0123456789abcdeffedcba987654321010123456789abcdeffedcba987654321010123456789abcdeffedcba98765432101>,3<0123456789abcdeffedcba98765432101>
+
+[THash_Whirlpool]
+<b3e1ab6eaf640a34f784593f2074416accd3b8e62c620175fca0997b1ba2347339aa0d79e754c308209ea36811dfa40c1c32f1a2b9004725d987d3635165d3c8>=<>
+<ee898fa681e89e1bba6764a5c07ced2f4a7bd1b8ec0637dd9caca94d398db29baf6993b278231e2b7a3eecffe027928a4a4c9ac6eb0de5f0fa58ede5949983d8>=<\x00>
+<8786611bb3601e913e9f9e0a77181fa6279b286f162e48d32c779ad2ca0168eae66bf50bb69fb889eaeabafd5613ff8d0aecba52d8a1bcdd48935fa416a10cb8>=<\x80>,63!<\x00>
+<f4b620445ae62431dbd6dbcec64d2a3031cd2f48df5e755f30b3d069929ed4b4eda0ae65441bc86746021fb7f2167f84d67566efaba003f0abb67a42a2ce5b13>=<a>
+<54ee18b0bbd4dd38a211699f2829793156e5842df502a2a25995c6c541f28cc050ff57d4af772dee7cedcc4c34c3b8ec06446c6657f2f36c2c06464399879b86>=<abc>
+<29e158ba336ce7f930115178a6c86019f0f413adb283d8f0798af06ca0a06d6d6f295a333b1c24bda2f429ac918a3748aef90f7a2c8bfb084d5f979cf4e7b2b5>=<message digest>
+<5ac9757e1407432daf348a972b8ad4a65c1123cf1f9b779c1ae7ee2d540f30b3cefa8f98dca5fbb42084c5c2f161a7b40eb6b4a1fc7f9aaab92a4bb6002edc5e>=<abcdefghijklmnopqrstuvwxyz>
+<cae4175f09753de84974cfa968621092fe41ee9de913919c2b452e6cb424056721d640e563f628f29dd3bd0030837ae4ac14aa17308505a92e5f7a92f112be75>=<ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789>
+<e5965b4565b041a0d459610e5e48e944c4830cd16feba02d9d263e7da8de6a6b88966709bf28a5328d928312e7a172da4cff72fe6de02277dae4b1dba49689a2>=8<1234567890>
+<76c8bc5f445140921ceaaed2afce4d0b0722fde3aea20145d9b14a72d22799f2ebb88446b7b46f4646eb33fc7e6f153183b2fd9e9a54557f41b10ab633b8b6e1>=<abcdbcdecdefdefgefghfghighijhijk>
+<bb6cba9730d6c029c0c15fb7a2aa3597cf9442dad96a676c5ee9a1d55f1d64d5e0d1ed0e71250ed960a1bd2e065642cfff1c976e061bab70d6c54d284eaaefb9>=15625<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+<bb6cba9730d6c029c0c15fb7a2aa3597cf9442dad96a676c5ee9a1d55f1d64d5e0d1ed0e71250ed960a1bd2e065642cfff1c976e061bab70d6c54d284eaaefb9>=15625!<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+
+[THash_Whirlpool1]
+<470f0409abaa446e49667d4ebe12a14387cedbd10dd17b8243cad550a089dc0feea7aa40f6c2aaab71c6ebd076e43c7cfca0ad32567897dcb5969861049a0f5a>=<>
+<ebaa1df2e97113be187eb0303c660f6e643e2c090ef2cda9a2ea6dcf5002147d1d0e1e9d996e879cef9d26896630a5db3308d5a0dc235b199c38923be2259e03>=<\x00>
+<a8583b83929bd46f0006e8401f87767ff0e23b96cd4cb2fe3774901ee6eeed91f43ab569fb908122c53a264a35687b40a0590d83e69fa82724380bae82a1caa0>=<\x80>,63!<\x00>
+<b290e0e7931025ed37043ad568f0036b40e6bff8f7455868780f47ef7b5d693e62448029a9351cd85ac29cb0725e4cfeb996a92f2b8da8768483ac58ec0e492c>=<a>
+<8afc0527dcc0a19623860ef2369d0e25de8ebe2abaa40f598afaf6b07c002ed73e4fc0fc220fd4f54f74b5d6b07aa57764c3dbdcc2cdd919d89fa8155a34b841>=<abc>
+<817eadf8efca5afbc11f71d0814e03a8d569c90f748c8603597a7a0de3c8d55f528199010218249517b58b14bee523515608754b53a3cca35c0865ba5e361431>=<message digest>
+<4afc2b07bddc8417635fcb43e695e16f45e116c226dd84339eb95c2ccb39e7acbe1af8f7b1f3bd380077e71929498bc968200371f9299015434d1df109a0aa1d>=<abcdefghijklmnopqrstuvwxyz>
+<0f960ec9ab7d0c7e355a423d1ef4911a39797c836a71414276afeb8fa475dba0c348547143162f3212edf1fb8d8c652a11a579a399c2dbd837fe8608f5096131>=<ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789>
+<6ae43784c69d01c273bba40f8411495167909e0c1acc241473d44e27bc8641e646535d38fce20604941988c387c201cff199c8fa2afbedd036d66202892a7eee>=8<1234567890>
+<7da3991ff3d40e0beed44b89c83bed5b085cc390a2df47765c99ae2ddb0a1e2e094ef0e8b0cf7ba4733afd756ef8eef59b918129fe2efe0b00024d6c4e56dc45>=<abcdbcdecdefdefgefghfghighijhijk>
+<0ee18ba7ca7ee091dace6285661eedf819a8fa17620f72aeffe5aa62c462138b626aa09072a10fcbcfe7f7ff22db2f4d6d1f0771856c4a7924f9b0e4044d9112>=15625<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+<0ee18ba7ca7ee091dace6285661eedf819a8fa17620f72aeffe5aa62c462138b626aa09072a10fcbcfe7f7ff22db2f4d6d1f0771856c4a7924f9b0e4044d9112>=15625!<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+
+[THash_Square]
+<417b878eaf7d8ca82414e6e4c4a95149>=<>
+<62148aad7927998c545c6f0e5feca9f0>=<a>
+<931b73d1a404f6f18880068056f6fc12>=<ab>,<c>
+<2068598052889ea245b4906f621f398c>=<message digest>
+<fc356316c8a28b7dbfe0ff3fef52bf53>=<abcdefghijklm>,<nopqrstuvwxyz>
+<b8654c7c554f18541bb28794a17f0c09>=<A>,<BCDEFGHIJKLMNOPQRS>,<TUVWXYZabcdefghijklmnopqrstuvwxyz012345678>,<9>
+<0c004c5b7066610e2a2dd2eecaee3186>=8<1234567890>
+<c3ba10de37cdec5e99def41475f1df5d>=<This test vector intended to detect last zeroized block necessity decision error. This block has total length 119 bytes>
+<058a1da3a62f3e6a8ba9135373a089ca>=<This test vector intended to detect last zeroized block necessity decision error. This block has total length 120 bytes.>
+
+
+[THash_Snefru128]
+<8617f366566a011837f4fb4ba5bedea2>=<>
+<d9fcb3171c097fbba8c8f12aa0906bad>=<\x0a>
+<44ec420ce99c1f62feb66c53c24ae453>=<1\x0a>
+<7182051aa852ef6fba4b6c9c9b79b317>=<12\x0a>
+<bc3a50af82bf56d6a64732bc7b050a93>=<123\x0a>
+<c5b8a04985a8eadfb4331a8988752b77>=<1234\x0a>
+<d559a2b62f6f44111324f85208723707>=<12345\x0a>
+<6cfb5e8f1da02bd167b01e4816686c30>=<123456\x0a>
+<29aa48325f275a8a7a01ba1543c54ba5>=<1234567\x0a>
+<be862a6b68b7df887ebe00319cbc4a47>=<12345678\x0a>
+<6103721ccd8ad565d68e90b0f8906163>=<123456789\x0a>
+<553d0648928299a0f22a275a02c83b10>=<abc>
+<7840148a66b91c219c36f127a0929606>=<abcdefghijklm>,<nopqrstuvwxyz>
+<d9204ed80bb8430c0b9c244fe485814a>=8<1234567890>
+<dd0d1ab288c3c36671044f41c5077ad6>=<Test message for buffer workflow test(47 bytes)>
+<e7054f05bd72d7e86a052153a17c741d>=<Test message for buffer workflow test(48 bytes).>
+<9b34204833422df13c83e10a0c6d080a>=<Test message for buffer workflow test(49 bytes)..>
+
+[THash_Snefru256]
+<8617f366566a011837f4fb4ba5bedea2b892f3ed8b894023d16ae344b2be5881>=<>
+<2e02687f0d45d5b9b50cb68c3f33e6843d618a1aca2d06893d3eb4e3026b5732>=<\x0a>
+<bfea4a05a2a2ef15c736d114598a20b9d9bd4d66b661e6b05ecf6a7737bdc58c>=<1\x0a>
+<ac677d69761ade3f189c7aef106d5fe7392d324e19cc76d5db4a2c05f2cc2cc5>=<12\x0a>
+<061c76aa1db4a22c0e42945e26c48499b5400162e08c640be05d3c007c44793d>=<123\x0a>
+<1e87fe1d9c927e9e24be85e3cc73359873541640a6261793ce5a974953113f5e>=<1234\x0a>
+<1b59927d85a9349a87796620fe2ff401a06a7ba48794498ebab978efc3a68912>=<12345\x0a>
+<28e9d9bc35032b68faeda88101ecb2524317e9da111b0e3e7094107212d9cf72>=<123456\x0a>
+<f7fff4ee74fd1b8d6b3267f84e47e007f029d13b8af7e37e34d13b469b8f248f>=<1234567\x0a>
+<ee7d64b0102b2205e98926613b200185559d08be6ad787da717c968744e11af3>=<12345678\x0a>
+<4ca72639e40e9ab9c0c3f523c4449b3911632d374c124d7702192ec2e4e0b7a3>=<123456789\x0a>
+<7d033205647a2af3dc8339f6cb25643c33ebc622d32979c4b612b02c4903031b>=<abc>
+<9304bb2f876d9c4f54546cf7ec59e0a006bead745f08c642f25a7c808e0bf86e>=<abcdefghijklm>,<nopqrstuvwxyz>
+<d5fce38a152a2d9b83ab44c29306ee45ab0aed0e38c957ec431dab6ed6bb71b8>=8<1234567890>
+
+[THash_Sapphire]
+.RequestedDigestSize=16
+<c1e0df6ce706a32fb7b25b7ac55f436a>=<>
+<4acf17d911781571f053ce82e2f70cce>=<abc>
+.RequestedDigestSize=20
+<c1e0df6ce706a32fb7b25b7ac55f436ad29c9fe5>=<>
+<4acf17d911781571f053ce82e2f70cce5470f410>=<abc>
+.RequestedDigestSize=24
+<c1e0df6ce706a32fb7b25b7ac55f436ad29c9fe54b096f54>=<>
+<4acf17d911781571f053ce82e2f70cce5470f410b717b9a6>=<abc>
+.RequestedDigestSize=28
+<c1e0df6ce706a32fb7b25b7ac55f436ad29c9fe54b096f54a2a128bb>=<>
+<4acf17d911781571f053ce82e2f70cce5470f410b717b9a699063814>=<abc>
+.RequestedDigestSize=32
+<c1e0df6ce706a32fb7b25b7ac55f436ad29c9fe54b096f54a2a128bb08c9651f>=<>
+<4acf17d911781571f053ce82e2f70cce5470f410b717b9a699063814b6df1f32>=<abc>
+.RequestedDigestSize=36
+<c1e0df6ce706a32fb7b25b7ac55f436ad29c9fe54b096f54a2a128bb08c9651f34606520>=<>
+<4acf17d911781571f053ce82e2f70cce5470f410b717b9a699063814b6df1f327c766773>=<abc>
+.RequestedDigestSize=40
+<c1e0df6ce706a32fb7b25b7ac55f436ad29c9fe54b096f54a2a128bb08c9651f34606520fa7a5ad7>=<>
+<8b3763c9e423995743a702a37cc4a82c9771c7ac04fe44990d2cf64a311715406a59cf62b0b4edc9>=<a>
+<4acf17d911781571f053ce82e2f70cce5470f410b717b9a699063814b6df1f327c766773fc59830b>=<ab>,<c>
+<e0affc0f16c9303c9938dbc9b1e6be3a3dcb75a2879ef8227fdd42595980793c94e7d3e33ce0a20a>=<message digest>
+<23b86cf1a67c6870b90e594be9b4eda4c3862036edf1efb03c86863c274585cf5837429f1ff6f4b0>=<abcdefghijklm>,<nopqrstuvwxyz>
+<341530ae3c1f715197847eddd38b4f58cc9a13c3e65f890772c9c561b103d2bf41340dff2af0335f>=<A>,<BCDEFGHIJKLMNOPQRS>,<TUVWXYZabcdefghijklmnopqrstuvwxyz012345678>,<9>
+<5bb5a1bd1ad4974042aa74992489fbdec857212a29cedc67b1fc79ddc9f139c3f52044be4e6f8588>=8<1234567890>
+
+# Delphi Encryption Compendium
+# Cipher Algorithm Test Cases
+# 22.03.2006
+
+[TCipher_Rijndael]
+.Password=\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00
+.IFiller=$00
+.Mode=cmECBx
+<66e94bd4ef8a2c3b884cfa59ca342b2e>=<\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00>
+
+.Password=\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00
+.IFiller=$00
+.Mode=cmECBx
+<aae06992acbf52a3e8f4a96ec9300bd7>=<\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00>
+
+.Password=\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00
+.IFiller=$00
+.Mode=cmECBx
+<dc95c078a2408989ad48a21492842087>=<\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00>
+
+[TCipher_Blowfish]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_Blowfish
+.IFiller=$FF
+.Mode=cmCTSx
+<1971cacd2b9c8529da8147b7ebce16c6910e1dc840123e3570edbc964c13d0b8>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_Twofish]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_Twofish
+.IFiller=$FF
+.Mode=cmCTSx
+<e81674f9bc69442188c949bb52e1e47874171177e99dbbe9880875094f8dfe21>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_IDEA]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_IDEA
+.IFiller=$FF
+.Mode=cmCTSx
+<8c65cad843e79993ed41ea48fd665094a2256dd7b1d09a233dd2e8ecc9457f7e>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_CAST256]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_CAST256
+.IFiller=$FF
+.Mode=cmCTSx
+<45820e97772071993e2945d5594feca5cd583875469ca7c5faa6339c82fb9254>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_Mars]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_Mars
+.IFiller=$FF
+.Mode=cmCTSx
+<fda54d3c1d79739ceaf668675595e210b145bfa9e4ab65efaa68c88ea34ab09d>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_RC4]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_RC4
+.IFiller=$FF
+.Mode=cmCTSx
+<cfbb1291ba5b690a09ca5d14c2e5a229196d183f5539a4edc56c2bfb7c12d630>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_RC6]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_RC6
+.IFiller=$FF
+.Mode=cmCTSx
+<987165a110febdf907853efc21dbfca18f5f8bf74528810def9a227af0622cc6>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_Square]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_Square
+.IFiller=$FF
+.Mode=cmCTSx
+<439ca6c467e82e472295668506396ac9182120f74436f1617d1490b1a96856c7>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_SCOP]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_SCOP
+.IFiller=$FF
+.Mode=cmCTSx
+<b1a7ee707aab160af9b9c3ebc2db5ee814a28995d2c1f994c53ca159ee052632>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_Sapphire]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_Sapphire
+.IFiller=$FF
+.Mode=cmCTSx
+<cff8d04e8e0d42e6aef37afaacbe9b08850c4d0c75ac54c0b9388e54e5609650>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_1DES]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_1DES
+.IFiller=$FF
+.Mode=cmCTSx
+<ad6942bbf668204d53cdc762139398c0300d850be2aa72096fdb5f8ed3e4cf8a>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_2DES]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_2DES
+.IFiller=$FF
+.Mode=cmCTSx
+<665c7927e91c8ba0a9e4995a158cbd465c9c75913c38069d75b47e68e947fdab>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_3DES]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_3DES
+.IFiller=$FF
+.Mode=cmCTSx
+<074c14f3e22e08d964bf6f82b5dff0a22f2d3bdb17db25b6b51efa71372fd172>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_2DDES]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_2DDES
+.IFiller=$FF
+.Mode=cmCTSx
+<936cf643c6a77fed4db4704ae2a6068b751319afe182ed354e13f688a46b3326>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_3DDES]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_3DDES
+.IFiller=$FF
+.Mode=cmCTSx
+<2f5a5ed45e8aaa4ed26659481de195942a9fcc1f4de614f050040364669a778e>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_3TDES]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_3TDES
+.IFiller=$FF
+.Mode=cmCTSx
+<899e748e57060649fc7436b21a538bb8d64b57c6a0863bf6b5f18468c0f6466e>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_3Way]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_3Way
+.IFiller=$FF
+.Mode=cmCTSx
+<77fc77947c8fde21e981df2ab1bc7ef8a3b6444bb6fc79c49b4058cee8959e12>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_Cast128]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_Cast128
+.IFiller=$FF
+.Mode=cmCTSx
+<6c27d14cf6ba76e7a4781c20188c30bcd29af62a631ffd04893fc70e07a9949b>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_Gost]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_Gost
+.IFiller=$FF
+.Mode=cmCTSx
+<b303a03fb57b914d97512440bdcf251534059cf8ab10869ff2804784479b1ad1>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_Misty]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_Misty
+.IFiller=$FF
+.Mode=cmCTSx
+<647bc5c64945aa955d64cd567c6cb6478157fe8cf48419bc27600ca679850fc9>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_NewDES]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_NewDES
+.IFiller=$FF
+.Mode=cmCTSx
+<d5914f9c743546fbd5ad9131751464fea779216a29994789d20d760c739ccd17>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_Q128]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_Q128
+.IFiller=$FF
+.Mode=cmCTSx
+<99aad03dca144e2af81e01a0eaab9f48232d5954547e2b128680e833ebe15eae>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_RC2]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_RC2
+.IFiller=$FF
+.Mode=cmCTSx
+<71a2f0fdc2f93c871064b779d3fcdd1153364fd71153775d8d53a72e8b8af9e7>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_RC5]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_RC5
+.IFiller=$FF
+.Mode=cmCTSx
+<10392ce00b5f097fd6b16c0eb975d5ccfcbeb58d41ac547c8330269daccb0a69>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_SAFER]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_SAFER
+.IFiller=$FF
+.Mode=cmCTSx
+<003d4920736385aad9c20ade7e9ee9ab24d07434477e211d55f935289884a875>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_Shark]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_Shark
+.IFiller=$FF
+.Mode=cmCTSx
+<d96521aac0c384609dce1f8bfbab183fa121acf85349c06f273a8915d37ae90b>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_Skipjack]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_Skipjack
+.IFiller=$FF
+.Mode=cmCTSx
+<d513a692ec2435e8174e2b555e8d27dac99aa9b9213da0011802b30eb7b551ea>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_TEA]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_TEA
+.IFiller=$FF
+.Mode=cmCTSx
+<b7b8aabb264b06f97086b0e4560429ccbf55ea4eef59261819b0037c298ce277>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+[TCipher_TEAN]
+# DEC Version 3.0 Selftest Testvector
+.Password=TCipher_TEAN
+.IFiller=$FF
+.Mode=cmCTSx
+<cd7ebba2921a4b3be29e62cff71da5df63339429e2367c663ff81af90278bfa1>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+

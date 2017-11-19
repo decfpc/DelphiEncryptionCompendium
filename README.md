@@ -1,0 +1,2 @@
+# DelphiEncryptionCompendium
+Delphi Encryption Compendium

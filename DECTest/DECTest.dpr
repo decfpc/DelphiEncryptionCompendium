@@ -15,7 +15,7 @@ uses
   {$ENDIF}
   SysUtils,
   TypInfo,
-  CRC,
+  DECCRC,
   DECUtil,
   DECFmt,
   DECHash,

@@ -35,7 +35,7 @@ unit DECUtil;
 
 interface
 
-uses {$IFDEF MSWINDOWS}Windows,{$ENDIF} SysUtils, Classes, CRC;
+uses {$IFDEF MSWINDOWS}Windows,{$ENDIF} SysUtils, Classes, DECCRC;
 
 type
 {$IFNDEF UNICODE}

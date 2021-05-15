@@ -173,7 +173,7 @@ var
 
 implementation
 
-uses CRC;
+uses DECCRC;
 
 resourcestring
   //sStringFormatExists  = 'String format "%d" does not exist.';

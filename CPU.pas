@@ -108,15 +108,18 @@ const
   ffTM         = $20000000; // Thermal control circuit TCC supported
   ffIA64       = $40000000; // IA-64 architecture
   // ffRes5       = $80000000;
-               
+
+type
+  CPUDouble = {$IFDEF CPU386}Comp{$ELSE}Double{$ENDIF};
+
 function CPUType: Integer; {any cfXXXX Value}
 function CPUData: TCPUData;
 function CPUVendor: String;
-function CPUSpeedRaw(Delay: Cardinal): Comp;
+function CPUSpeedRaw(Delay: Cardinal): CPUDouble;
 function CPUSpeed: Cardinal;
 
-function PerfCounter: Comp;
-function PerfFreq: Comp;
+function PerfCounter: CPUDouble;
+function PerfFreq: CPUDouble;
 function RDTSC: Int64;
 {$ENDIF}
 
@@ -134,22 +137,22 @@ resourcestring
 var
   FCPU: TCPUData;
 
-function QPC(var C: Comp): Bool; stdcall; external 'kernel32.dll' name 'QueryPerformanceCounter';
-function QPF(var F: Comp): Bool; stdcall; external 'kernel32.dll' name 'QueryPerformanceFrequency';
+function QPC(var C: CPUDouble): Bool; stdcall; external 'kernel32.dll' name 'QueryPerformanceCounter';
+function QPF(var F: CPUDouble): Bool; stdcall; external 'kernel32.dll' name 'QueryPerformanceFrequency';
 
-function PerfCounter: Comp;
+function PerfCounter: CPUDouble;
 begin
   if not QPC(Result) then Result := GetTickCount
 end;
 
-function PerfFreq: Comp;
+function PerfFreq: CPUDouble;
 begin
   if not QPF(Result) then Result := 1000
 end;
 
 function RDTSC: Int64;
 asm
-     DW    0310Fh
+  rdtsc
 end;
 
 {CPU Routines}
@@ -158,7 +161,7 @@ begin
   Result := FCPU.Family;
 end;
 
-function CPUSpeedRaw(Delay: Cardinal): Comp;
+function CPUSpeedRaw(Delay: Cardinal): CPUDouble;
 var
   C: Int64;
   D: Double;
@@ -384,7 +387,7 @@ asm
        MOV     [RDI +  8],ECX
        MOV     [RDI + 12],EDX
        INC     ESI
-       ADD     EDI,16
+       ADD     RDI,16
        AND     ESI,3
        JNZ     @@2
        POP     RDI

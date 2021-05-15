@@ -1,4 +1,4 @@
-﻿program DECTest;
+program DECTest;
 
 {$IFDEF FPC}
   {$MODE Delphi}

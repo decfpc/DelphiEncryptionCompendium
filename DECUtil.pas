@@ -42,9 +42,6 @@ type
   RawByteString  = AnsiString;
 {$ENDIF}
   Binary         = RawByteString; // LongString with Binary Content
-{$IFNDEF VER_D4H}
-  LongWord       = type Integer;
-{$ENDIF}
   PLongWord      = ^LongWord;
   PByte          = ^Byte;
   PInteger       = ^Integer;
@@ -875,13 +872,18 @@ end;
 {$ENDIF}
 
 {$IFNDEF FPC}
+{$IF CompilerVersion < 20.0}
+type
+  NativeInt = Integer;
+{$IFEND}
+
 procedure ModuleUnload(Instance: NativeInt);
 var // automaticaly deregistration/releasing
   I: Integer;
 begin
   if IsObject(FClasses, TList) then
     for I := FClasses.Count -1 downto 0 do
-      if Integer(FindClassHInstance(TClass(FClasses[I]))) = Instance then
+      if NativeInt(FindClassHInstance(TClass(FClasses[I]))) = Instance then
         FClasses.Delete(I);
 end;
 

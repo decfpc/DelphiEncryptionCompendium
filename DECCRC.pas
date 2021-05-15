@@ -102,7 +102,7 @@ type
 function CRCCalc(CRCType: TCRCType; const Buffer; Size: Cardinal): Cardinal;
 
 // use a callback
-function CRCCalcEx(CRCType: TCRCType; ReadMethod: TReadMethod; Size: Cardinal{$IFDEF VER_D4H} = $FFFFFFFF{$ENDIF}): Cardinal;
+function CRCCalcEx(CRCType: TCRCType; ReadMethod: TReadMethod; Size: Cardinal = $FFFFFFFF): Cardinal;
 
 // initialize CRC Definition with CRCType Standard CRC
 function CRCInit(var CRCDef: TCRCDef; CRCType: TCRCType): Boolean;
@@ -117,7 +117,7 @@ function CRCSetup(var CRCDef: TCRCDef; Polynomial, Bits, InitVector, FinalVector
 function CRCCode(var CRCDef: TCRCDef; const Buffer; Size: Cardinal): Cardinal;
 
 // use a callback, eg. TStream.Read(). I hate D4 because they don't love overloaded procedures here
-function CRCCodeEx(var CRCDef: TCRCDef; ReadMethod: TReadMethod; Size: Cardinal{$IFDEF VER_D4H} = $FFFFFFFF{$ENDIF}): Cardinal;
+function CRCCodeEx(var CRCDef: TCRCDef; ReadMethod: TReadMethod; Size: Cardinal = $FFFFFFFF): Cardinal;
 
 // retruns corrected CRC as definied in CRCDef, and reset CRCDef.CRC to InitVector
 function CRCDone(var CRCDef: TCRCDef): Cardinal;

@@ -26,112 +26,14 @@
 
 {.$A+,B-,E-,F-,G+,H+,I-,J+,K-,N+,P+,Q-,R-,S-,T-,V+,W-,X+,Y-,G+}
 
-{$IFDEF CPU386} // must have a 486 or higher though, 386 itself is not supported by DEC!
-  {$DEFINE UseASM86}        // use Assembler optimated core
+{$IFDEF CPU386}
+  {$DEFINE UseASM86} // use assembler optimized functions
 {$ENDIF}
 
-{$IFDEF VER80}  { Delphi 1.0     }
-  {$DEFINE VER_D1}
-  {$DEFINE VER_D1H}
+{$A4}
+{$IFNDEF FPC}
+  {$WARN UNSAFE_TYPE OFF}
+  {$WARN UNSAFE_CODE OFF}
+  {$WARN UNSAFE_CAST OFF}
 {$ENDIF}
 
-{$IFDEF VER90}  { Delphi 2.0     }
-  {$DEFINE VER_D2}
-  {$DEFINE VER_D2H}
-  {$DEFINE VER_D1H}
-{$ENDIF}
-
-{$IFDEF VER100} {Borland Delphi 3.0 }
-  {$DEFINE VER_D3}
-  {$DEFINE VER_D3H}
-  {$DEFINE VER_D2H}
-  {$DEFINE VER_D1H}
-{$ENDIF}
-
-{$IFDEF VER120} {Borland Delphi 4.0 }
-  {$DEFINE VER_D4}
-  {$DEFINE VER_D4H}
-  {$DEFINE VER_D3H}
-  {$DEFINE VER_D2H}
-  {$DEFINE VER_D1H}
-{$ENDIF}
-
-{$IFDEF VER130} {Borland Delphi 5.0 }
-  {$DEFINE VER_D5}
-  {$DEFINE VER_D5H}
-  {$DEFINE VER_D4H}
-  {$DEFINE VER_D3H}
-  {$DEFINE VER_D2H}
-  {$DEFINE VER_D1H}
-{$ENDIF}
-
-{$IFDEF VER140} {Borland Delphi 6.0 }
-  {$DEFINE VER_D6}
-  {$DEFINE VER_D6H}
-  {$DEFINE VER_D5H}
-  {$DEFINE VER_D4H}
-  {$DEFINE VER_D3H}
-  {$DEFINE VER_D2H}
-  {$DEFINE VER_D1H}
-{$ENDIF}
-
-{$IFDEF VER150} {Borland Delphi 7.0 }
-  {$DEFINE VER_D7}
-  {$DEFINE VER_D7H}
-  {$DEFINE VER_D6H}
-  {$DEFINE VER_D5H}
-  {$DEFINE VER_D4H}
-  {$DEFINE VER_D3H}
-  {$DEFINE VER_D2H}
-  {$DEFINE VER_D1H}
-{$ENDIF}
-
-{$IFDEF VER93}  { Borland C++Builder 1.0 }
-  {$DEFINE VER_BCB1}
-  {$DEFINE VER_BCB1H}
-{$ENDIF}
-
-{$IFDEF VER110} { Borland C++Builder 3.0 }
-  {$DEFINE VER_BCB3}
-  {$DEFINE VER_BCB3H}
-  {$DEFINE VER_BCB1H}
-{$ENDIF}
-
-{$IFDEF VER125}
-  {$DEFINE VER_BCB4}
-  {$DEFINE VER_BCB4H}
-  {$DEFINE VER_BCB3H}
-  {$DEFINE VER_BCB1H}
-{$ENDIF}
-
-{$IFNDEF VER80}           { Delphi 1.0     }
- {$IFNDEF VER90}          { Delphi 2.0     }
-  {$IFNDEF VER93}         { C++Builder 1.0 }
-    {$DEFINE VER_D3H}     { Delphi 3.0 or higher }
-    {$IFNDEF VER100}
-      {$DEFINE VER_BCB3H} { C++Builder 3.0 or higher }
-      {$IFNDEF VER110}
-        {$DEFINE VER_D4H} { Delphi 4.0 or higher }
-        {$IFNDEF VER120}
-           {$DEFINE VER_D5H}
-           {$IFNDEF VER130}
-              {$DEFINE VER_D6H}
-              {$IFNDEF VER140}
-                 {$DEFINE VER_D7H}
-              {$ENDIF}
-           {$ENDIF}
-        {$ENDIF}
-      {$ENDIF}
-    {$ENDIF}
-  {$ENDIF}
- {$ENDIF}
-{$ENDIF}
-
-{$IFDEF VER_D7H}
-  {$A4}
-  {$IFNDEF FPC}
-    {$WARN UNSAFE_TYPE OFF}
-    {$WARN UNSAFE_CODE OFF}
-    {$WARN UNSAFE_CAST OFF}
-  {$ENDIF}
-{$ENDIF}

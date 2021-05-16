@@ -386,7 +386,6 @@ implementation
 uses DECData;
 
 {$I DECHash.inc}
-{$I Ver.inc}
 
 {                                        assembler                             pascal
 THash_SHA512        :       85.1 cycles/byte      17.62 Mb/sec      220.9 cycles/byte       6.79 Mb/sec  159%

@@ -390,7 +390,11 @@ begin
   I := 0;
   while I < Size do
   begin
+    {$IFNDEF ENDIAN_BIG}
     D^ := T[PWord(@S[I shr 3])^ shr (I and $7) and $1F];
+    {$ELSE}
+    D^ := T[Swap(PWord(@S[I shr 3])^) shr (I and $7) and $1F];
+    {$ENDIF}
     Inc(D);
     Inc(I, 5);
   end;
@@ -417,7 +421,11 @@ begin
     if V < 0 then V := TableFind(UpCase(S^), T, 32);
     if V >= 0 then
     begin
+      {$IFNDEF ENDIAN_BIG}
       PWord(@D[I shr 3])^ := PWord(@D[I shr 3])^ or (V shl (I and $7));
+      {$ELSE}
+      PWord(@D[I shr 3])^ := Swap(Word(Swap(PWord(@D[I shr 3])^) or (V shl (I and $7))));
+      {$ENDIF}
       Inc(I, 5);
     end else Dec(Size, 5);
     Inc(S);
@@ -561,7 +569,7 @@ begin
     if Length(R) >= 3 then
     begin
       Result := 0;
-      Move(PAnsiChar(R)^, Result, 3);
+      Move(PAnsiChar(R)^, {$IFNDEF ENDIAN_BIG}Result{$ELSE}PByteArray(@Result)[1]{$ENDIF}, 3);
       Size := L - PAnsiChar(@Value);
     end;
   except
@@ -575,10 +583,14 @@ begin
   Result := '';
   if Size <= 0 then Exit;
   Result := InsertCR(inherited DoEncode(Value, Size), PGPCharsPerLine); // 80 chars per line
-  CRC := CRCCalc(CRC_24, Value, Size);                               // calculate 24Bit Checksum
-  SwapBytes(CRC, 3);                                                 // PGP use Big Endian
   if Result[Length(Result)] <> #10 then Result := Result + #13#10;   // insert CR iff needed, CRC must be in next line
-  Result := Result + '=' + inherited DoEncode(CRC, 3);                 // append CRC
+  CRC := CRCCalc(CRC_24, Value, Size);                               // calculate 24Bit Checksum
+  {$IFNDEF ENDIAN_BIG}
+  SwapBytes(CRC, 3);                                                 // PGP use Big Endian
+  Result := Result + '=' + inherited DoEncode(CRC, 3);               // append CRC
+  {$ELSE}
+  Result := Result + '=' + inherited DoEncode(PByteArray(@CRC)[1], 3);
+  {$ENDIF}
 end;
 
 class function TFormat_PGP.DoDecode(const Value; Size: Integer): Binary;
@@ -591,7 +603,9 @@ begin
   Result := inherited DoDecode(Value, Size);
   if CRC <> $FFFFFFFF then // iff CRC found check it
   begin
+    {$IFNDEF ENDIAN_BIG}
     SwapBytes(CRC, 3);
+    {$ENDIF}
     if CRC <> CRCCalc(CRC_24, PAnsiChar(Result)^, Length(Result)) then
       raise EDECException.CreateFmt(sInvalidStringFormat, [DECClassname(Self)]);
   end;

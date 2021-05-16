@@ -848,8 +848,10 @@ end;
 
 procedure THashBaseMD4.DoDone;
 begin
-  if FCount[2] or FCount[3] <> 0 then HashingOverflowError;
-  if FPaddingByte = 0 then FPaddingByte := $80;
+  if FCount[2] or FCount[3] <> 0 then
+    HashingOverflowError;
+  if FPaddingByte = 0 then
+    FPaddingByte := $80;
   FBuffer[FBufferIndex] := FPaddingByte;
   Inc(FBufferIndex);
   if FBufferIndex > FBufferSize - 8 then
@@ -859,8 +861,21 @@ begin
     FBufferIndex := 0;
   end;
   FillChar(FBuffer[FBufferIndex], FBufferSize - FBufferIndex, 0);
+
+  {$IFNDEF ENDIAN_BIG}
   Move(FCount, FBuffer[FBufferSize - 8], 8);
+  {$ELSE}
+  SwapLongBuffer(FCount, FBuffer[FBufferSize - 8], 2);
+  {$ENDIF}
+
   DoTransform(Pointer(FBuffer));
+
+  {$IFDEF ENDIAN_BIG}
+  if ClassType <> THash_Tiger then
+    SwapLongBuffer(FDigest, FDigest, DigestSize div 4)
+  else
+    SwapInt64Buffer(FDigest, FDigest, DigestSize div 8);
+  {$ENDIF}
 end;
 
 // .THash_MD4
@@ -871,11 +886,19 @@ const
   S2 = $6ED9EBA1;
 var
   A,B,C,D: LongWord;
+  {$IFDEF ENDIAN_BIG}
+  BufferBig: array[0..15] of UInt32;
+  {$ENDIF}
 begin
   A := FDigest[0];
   B := FDigest[1];
   C := FDigest[2];
   D := FDigest[3];
+
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(Buffer^, BufferBig, 16);
+  Buffer := @BufferBig;
+  {$ENDIF}
 
   Inc(A, B and C or not B and D + Buffer[ 0]); A := A shl  3 or A shr 29;
   Inc(D, A and B or not A and C + Buffer[ 1]); D := D shl  7 or D shr 25;
@@ -940,11 +963,19 @@ end;
 procedure THash_MD5.DoTransform(Buffer: PLongArray);
 var
   A,B,C,D: LongWord;
+  {$IFDEF ENDIAN_BIG}
+  BufferBig: array[0..15] of UInt32;
+  {$ENDIF}
 begin
   A := FDigest[0];
   B := FDigest[1];
   C := FDigest[2];
   D := FDigest[3];
+
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(Buffer^, BufferBig, 16);
+  Buffer := @BufferBig;
+  {$ENDIF}
 
   Inc(A, Buffer[ 0] + $D76AA478 + (D xor (B and (C xor D)))); A := A shl  7 or A shr 25 + B;
   Inc(D, Buffer[ 1] + $E8C7B756 + (C xor (A and (B xor C)))); D := D shl 12 or D shr 20 + A;
@@ -1038,6 +1069,9 @@ var
   A1,B1,C1,D1: LongWord;
   A2,B2,C2,D2: LongWord;
   T: LongWord;
+  {$IFDEF ENDIAN_BIG}
+  BufferBig: array[0..15] of UInt32;
+  {$ENDIF}
 begin
   A1 := FDigest[0];
   B1 := FDigest[1];
@@ -1047,6 +1081,11 @@ begin
   B2 := FDigest[1];
   C2 := FDigest[2];
   D2 := FDigest[3];
+
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(Buffer^, BufferBig, 16);
+  Buffer := @BufferBig;
+  {$ENDIF}
 
   Inc(A1, B1 xor C1 xor D1 + Buffer[ 0]); A1 := A1 shl 11 or A1 shr 21;
   Inc(D1, A1 xor B1 xor C1 + Buffer[ 1]); D1 := D1 shl 14 or D1 shr 18;
@@ -1204,6 +1243,9 @@ var
   A1,B1,C1,D1,E1: LongWord;
   A2,B2,C2,D2,E2: LongWord;
   T: LongWord;
+  {$IFDEF ENDIAN_BIG}
+  BufferBig: array[0..15] of UInt32;
+  {$ENDIF}
 begin
   A1 := FDigest[0];
   B1 := FDigest[1];
@@ -1216,6 +1258,11 @@ begin
   C2 := FDigest[2];
   D2 := FDigest[3];
   E2 := FDigest[4];
+
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(Buffer^, BufferBig, 16);
+  Buffer := @BufferBig;
+  {$ENDIF}
 
   Inc(A1, B1 xor C1 xor D1 + Buffer[ 0]); A1 := A1 shl 11 or A1 shr 21 + E1; C1 := C1 shl 10 or C1 shr 22;
   Inc(E1, A1 xor B1 xor C1 + Buffer[ 1]); E1 := E1 shl 14 or E1 shr 18 + D1; B1 := B1 shl 10 or B1 shr 22;
@@ -1414,6 +1461,9 @@ var
   A1,B1,C1,D1: LongWord;
   A2,B2,C2,D2: LongWord;
   T: LongWord;
+  {$IFDEF ENDIAN_BIG}
+  BufferBig: array[0..15] of UInt32;
+  {$ENDIF}
 begin
   A1 := FDigest[0];
   B1 := FDigest[1];
@@ -1424,6 +1474,11 @@ begin
   B2 := FDigest[5];
   C2 := FDigest[6];
   D2 := FDigest[7];
+
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(Buffer^, BufferBig, 16);
+  Buffer := @BufferBig;
+  {$ENDIF}
 
   Inc(A1, B1 xor C1 xor D1 + Buffer[ 0]); A1 := A1 shl 11 or A1 shr 21;
   Inc(D1, A1 xor B1 xor C1 + Buffer[ 1]); D1 := D1 shl 14 or D1 shr 18;
@@ -1631,6 +1686,9 @@ var
   A1,B1,C1,D1,E1: LongWord;
   A2,B2,C2,D2,E2: LongWord;
   T: LongWord;
+  {$IFDEF ENDIAN_BIG}
+  BufferBig: array[0..15] of UInt32;
+  {$ENDIF}
 begin
   A1 := FDigest[0];
   B1 := FDigest[1];
@@ -1642,6 +1700,11 @@ begin
   C2 := FDigest[7];
   D2 := FDigest[8];
   E2 := FDigest[9];
+
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(Buffer^, BufferBig, 16);
+  Buffer := @BufferBig;
+  {$ENDIF}
 
   Inc(A1, B1 xor C1 xor D1 + Buffer[ 0]); A1 := A1 shl 11 or A1 shr 21 + E1; C1 := C1 shl 10 or C1 shr 22;
   Inc(E1, A1 xor B1 xor C1 + Buffer[ 1]); E1 := E1 shl 14 or E1 shr 18 + D1; B1 := B1 shl 10 or B1 shr 22;
@@ -1894,7 +1957,11 @@ var
   W: array[0..79] of LongWord;
   I: Integer;
 begin
+  {$IFNDEF ENDIAN_BIG}
   SwapLongBuffer(Buffer[0], W, 16);
+  {$ELSE}
+  Move(Buffer^, W, 64);
+  {$ENDIF}
   if ClassType = THash_SHA then
     for I := 16 to 79 do
     begin
@@ -2020,10 +2087,12 @@ begin
     FBufferIndex := 0;
   end;
   FillChar(FBuffer[FBufferIndex], FBufferSize - FBufferIndex, 0);
-  PLongWord(@FBuffer[FBufferSize - 8])^ := SwapLong(FCount[1]);
-  PLongWord(@FBuffer[FBufferSize - 4])^ := SwapLong(FCount[0]);
+  PLongWord(@FBuffer[FBufferSize - 8])^ := {$IFNDEF ENDIAN_BIG}SwapLong(FCount[1]){$ELSE}FCount[1]{$ENDIF};
+  PLongWord(@FBuffer[FBufferSize - 4])^ := {$IFNDEF ENDIAN_BIG}SwapLong(FCount[0]){$ELSE}FCount[0]{$ENDIF};
   DoTransform(Pointer(FBuffer));
+  {$IFNDEF ENDIAN_BIG}
   SwapLongBuffer(FDigest, FDigest, SizeOf(FDigest) div 4);
+  {$ENDIF}
 end;
 
 // .THash_SHA256
@@ -2053,7 +2122,11 @@ var
   T1,T2: LongWord;
   W: array[0..63] of LongWord;
 begin
+  {$IFNDEF ENDIAN_BIG}
   SwapLongBuffer(Buffer[0], W, 16);
+  {$ELSE}
+  Move(Buffer^, W, 16 * 4);
+  {$ENDIF}
 
   for I := 16 to 63 do
   begin
@@ -2118,7 +2191,11 @@ var
   I: Integer;
   W: array [0..79] of Int64;
 begin
+  {$IFNDEF ENDIAN_BIG}
   SwapInt64Buffer(Buffer[0], W, 16);
+  {$ELSE}
+  Move(Buffer^, W, 16 * 8);
+  {$ENDIF}
 
   // calculate other 64 uint64
   for I := 16 to 79 do
@@ -2190,13 +2267,17 @@ begin
     FBufferIndex := 0;
   end;
   FillChar(FBuffer[FBufferIndex], FBufferSize - FBufferIndex, 0);
+  {$IFNDEF ENDIAN_BIG}
   SwapLongBuffer(FCount, FCount, 4);
+  {$ENDIF}
   PLongWord(@FBuffer[FBufferSize - 16])^ := FCount[3];
   PLongWord(@FBuffer[FBufferSize - 12])^ := FCount[2];
   PLongWord(@FBuffer[FBufferSize -  8])^ := FCount[1];
   PLongWord(@FBuffer[FBufferSize -  4])^ := FCount[0];
   DoTransform(Pointer(FBuffer));
+  {$IFNDEF ENDIAN_BIG}
   SwapInt64Buffer(FDigest, FDigest, SizeOf(FDigest) div 8);
+  {$ENDIF}
 end;
 
 // .THash_SHA512
@@ -2243,9 +2324,17 @@ var
   A,B,C,D,E,F,G,H,I,T: LongWord;
   Data: PLongWord;
   Offset: PByte;
+  {$IFDEF ENDIAN_BIG}
+  BufferBig: array[0..31] of UInt32;
+  {$ENDIF}
 begin
   Offset := @Haval_Offset;
   Data   := @Haval_Data;
+
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(Buffer^, BufferBig, 32);
+  Buffer := @BufferBig;
+  {$ENDIF}
 
   A := FDigest[0];
   B := FDigest[1];
@@ -2292,9 +2381,17 @@ var
   A,B,C,D,E,F,G,H,I,T: LongWord;
   Data: PLongWord;
   Offset: PByte;
+  {$IFDEF ENDIAN_BIG}
+  BufferBig: array[0..31] of UInt32;
+  {$ENDIF}
 begin
   Offset := @Haval_Offset;
   Data   := @Haval_Data;
+
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(Buffer^, BufferBig, 32);
+  Buffer := @BufferBig;
+  {$ENDIF}
 
   A := FDigest[0];
   B := FDigest[1];
@@ -2350,9 +2447,17 @@ var
   A,B,C,D,E,F,G,H,I,T: LongWord;
   Data: PLongWord;
   Offset: PByte;
+  {$IFDEF ENDIAN_BIG}
+  BufferBig: array[0..31] of UInt32;
+  {$ENDIF}
 begin
   Offset := @Haval_Offset;
   Data   := @Haval_Data;
+
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(Buffer^, BufferBig, 32);
+  Buffer := @BufferBig;
+  {$ENDIF}
 
   A := FDigest[0];
   B := FDigest[1];
@@ -2453,8 +2558,13 @@ begin
   end;
   FillChar(FBuffer[FBufferIndex], FBufferSize - FBufferIndex -10, 0);
   T := DigestSize shl 9 or FRounds shl 3 or 1;
-  Move(T, FBuffer[FBufferSize - 10], SizeOf(T));
+  {$IFNDEF ENDIAN_BIG}
+  Move(T, FBuffer[FBufferSize - 10], 2);
   Move(FCount, FBuffer[FBufferSize - 8], 8);
+  {$ELSE}
+  PWord(@FBuffer[FBufferSize - 10])^ := Swap(T);
+  SwapLongBuffer(FCount, FBuffer[FBufferSize - 8], 2);
+  {$ENDIF}
   DoTransform(Pointer(FBuffer));
 
   case DigestSize of
@@ -2517,6 +2627,10 @@ begin
           Inc(FDigest[6], FDigest[7]        and $0F);
         end;
   end;
+
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(FDigest, FDigest, DigestSize div 4);
+  {$ENDIF}
 end;
 
 class function THashBaseHaval.BlockSize: Integer;
@@ -2569,12 +2683,8 @@ end;
 {$IFNDEF THash_Tiger_asm}
 procedure THash_Tiger.DoTransform(Buffer: PLongArray);
 type
-  //PTiger_Data = ^TTiger_Data;
-  TTiger_Data = array[0..3, 0..255] of Int64;
-
   PInt64Array = ^TInt64Array;
   TInt64Array = array[0..7] of Int64;
-
 var
   A,B,C,T: Int64;
   x0,x1,x2,x3,x4,x5,x6,x7: Int64;
@@ -2583,16 +2693,16 @@ begin
   A  := PInt64Array(@FDigest)[0];
   B  := PInt64Array(@FDigest)[1];
   C  := PInt64Array(@FDigest)[2];
-  x0 := PInt64Array(Buffer)[0];
-  x1 := PInt64Array(Buffer)[1];
-  x2 := PInt64Array(Buffer)[2];
-  x3 := PInt64Array(Buffer)[3];
-  x4 := PInt64Array(Buffer)[4];
-  x5 := PInt64Array(Buffer)[5];
-  x6 := PInt64Array(Buffer)[6];
-  x7 := PInt64Array(Buffer)[7];
+  x0 := {$IFNDEF ENDIAN_BIG}PInt64Array(Buffer)[0]{$ELSE}SwapInt64(PInt64Array(Buffer)[0]){$ENDIF};
+  x1 := {$IFNDEF ENDIAN_BIG}PInt64Array(Buffer)[1]{$ELSE}SwapInt64(PInt64Array(Buffer)[1]){$ENDIF};
+  x2 := {$IFNDEF ENDIAN_BIG}PInt64Array(Buffer)[2]{$ELSE}SwapInt64(PInt64Array(Buffer)[2]){$ENDIF};
+  x3 := {$IFNDEF ENDIAN_BIG}PInt64Array(Buffer)[3]{$ELSE}SwapInt64(PInt64Array(Buffer)[3]){$ENDIF};
+  x4 := {$IFNDEF ENDIAN_BIG}PInt64Array(Buffer)[4]{$ELSE}SwapInt64(PInt64Array(Buffer)[4]){$ENDIF};
+  x5 := {$IFNDEF ENDIAN_BIG}PInt64Array(Buffer)[5]{$ELSE}SwapInt64(PInt64Array(Buffer)[5]){$ENDIF};
+  x6 := {$IFNDEF ENDIAN_BIG}PInt64Array(Buffer)[6]{$ELSE}SwapInt64(PInt64Array(Buffer)[6]){$ENDIF};
+  x7 := {$IFNDEF ENDIAN_BIG}PInt64Array(Buffer)[7]{$ELSE}SwapInt64(PInt64Array(Buffer)[7]){$ENDIF};
 
-  for I := 1 to FRounds do {a Loop is faster for PC's with small Cache}
+  for I := 1 to FRounds do
   begin
     if I > 1 then {key schedule}
     begin
@@ -2615,105 +2725,105 @@ begin
     end;
 
     C := C xor x0;
-    Dec(A, TTiger_Data(Tiger_Data)[0, LongWord(C)        and $FF] xor
-           TTiger_Data(Tiger_Data)[1, LongWord(C) shr 16 and $FF] xor
-           TTiger_Data(Tiger_Data)[2,          C  shr 32 and $FF] xor
-           TTiger_Data(Tiger_Data)[3, LongWord(C shr 32) shr 16 and $FF]);
-    Inc(B, TTiger_Data(Tiger_Data)[3, LongWord(C) shr  8 and $FF] xor
-           TTiger_Data(Tiger_Data)[2, LongWord(C) shr 24] xor
-           TTiger_Data(Tiger_Data)[1, LongWord(C shr 32) shr 8 and $FF] xor
-           TTiger_Data(Tiger_Data)[0, LongWord(C shr 32) shr 24]);
+    Dec(A, Tiger_Data[0, LongWord(C)        and $FF] xor
+           Tiger_Data[1, LongWord(C) shr 16 and $FF] xor
+           Tiger_Data[2,          C  shr 32 and $FF] xor
+           Tiger_Data[3, LongWord(C shr 32) shr 16 and $FF]);
+    Inc(B, Tiger_Data[3, LongWord(C) shr  8 and $FF] xor
+           Tiger_Data[2, LongWord(C) shr 24] xor
+           Tiger_Data[1, LongWord(C shr 32) shr 8 and $FF] xor
+           Tiger_Data[0, LongWord(C shr 32) shr 24]);
     if I = 1 then B := B shl 2 + B else
       if I = 2 then B := B shl 3 - B
         else B := B shl 3 + B;
 
     A := A xor x1;
-    Dec(B, TTiger_Data(Tiger_Data)[0, LongWord(A)        and $FF] xor
-           TTiger_Data(Tiger_Data)[1, LongWord(A) shr 16 and $FF] xor
-           TTiger_Data(Tiger_Data)[2,          A  shr 32 and $FF] xor
-           TTiger_Data(Tiger_Data)[3, LongWord(A shr 32) shr 16 and $FF]);
-    Inc(C, TTiger_Data(Tiger_Data)[3, LongWord(A) shr  8 and $FF] xor
-           TTiger_Data(Tiger_Data)[2, LongWord(A) shr 24] xor
-           TTiger_Data(Tiger_Data)[1, LongWord(A shr 32) shr 8 and $FF] xor
-           TTiger_Data(Tiger_Data)[0, LongWord(A shr 32) shr 24]);
+    Dec(B, Tiger_Data[0, LongWord(A)        and $FF] xor
+           Tiger_Data[1, LongWord(A) shr 16 and $FF] xor
+           Tiger_Data[2,          A  shr 32 and $FF] xor
+           Tiger_Data[3, LongWord(A shr 32) shr 16 and $FF]);
+    Inc(C, Tiger_Data[3, LongWord(A) shr  8 and $FF] xor
+           Tiger_Data[2, LongWord(A) shr 24] xor
+           Tiger_Data[1, LongWord(A shr 32) shr 8 and $FF] xor
+           Tiger_Data[0, LongWord(A shr 32) shr 24]);
     if I = 1 then C := C shl 2 + C else
       if I = 2 then C := C shl 3 - C
         else C := C shl 3 + C;
 
     B := B xor x2;
-    Dec(C, TTiger_Data(Tiger_Data)[0, LongWord(B)        and $FF] xor
-           TTiger_Data(Tiger_Data)[1, LongWord(B) shr 16 and $FF] xor
-           TTiger_Data(Tiger_Data)[2,          B  shr 32 and $FF] xor
-           TTiger_Data(Tiger_Data)[3, LongWord(B shr 32) shr 16 and $FF]);
-    Inc(A, TTiger_Data(Tiger_Data)[3, LongWord(B) shr  8 and $FF] xor
-           TTiger_Data(Tiger_Data)[2, LongWord(B) shr 24] xor
-           TTiger_Data(Tiger_Data)[1, LongWord(B shr 32) shr 8 and $FF] xor
-           TTiger_Data(Tiger_Data)[0, LongWord(B shr 32) shr 24]);
+    Dec(C, Tiger_Data[0, LongWord(B)        and $FF] xor
+           Tiger_Data[1, LongWord(B) shr 16 and $FF] xor
+           Tiger_Data[2,          B  shr 32 and $FF] xor
+           Tiger_Data[3, LongWord(B shr 32) shr 16 and $FF]);
+    Inc(A, Tiger_Data[3, LongWord(B) shr  8 and $FF] xor
+           Tiger_Data[2, LongWord(B) shr 24] xor
+           Tiger_Data[1, LongWord(B shr 32) shr 8 and $FF] xor
+           Tiger_Data[0, LongWord(B shr 32) shr 24]);
     if I = 1 then A := A shl 2 + A else
       if I = 2 then A := A shl 3 - A
         else A := A shl 3 + A;
 
     C := C xor x3;
-    Dec(A, TTiger_Data(Tiger_Data)[0, LongWord(C)        and $FF] xor
-           TTiger_Data(Tiger_Data)[1, LongWord(C) shr 16 and $FF] xor
-           TTiger_Data(Tiger_Data)[2,          C  shr 32 and $FF] xor
-           TTiger_Data(Tiger_Data)[3, LongWord(C shr 32) shr 16 and $FF]);
-    Inc(B, TTiger_Data(Tiger_Data)[3, LongWord(C) shr  8 and $FF] xor
-           TTiger_Data(Tiger_Data)[2, LongWord(C) shr 24] xor
-           TTiger_Data(Tiger_Data)[1, LongWord(C shr 32) shr 8 and $FF] xor
-           TTiger_Data(Tiger_Data)[0, LongWord(C shr 32) shr 24]);
+    Dec(A, Tiger_Data[0, LongWord(C)        and $FF] xor
+           Tiger_Data[1, LongWord(C) shr 16 and $FF] xor
+           Tiger_Data[2,          C  shr 32 and $FF] xor
+           Tiger_Data[3, LongWord(C shr 32) shr 16 and $FF]);
+    Inc(B, Tiger_Data[3, LongWord(C) shr  8 and $FF] xor
+           Tiger_Data[2, LongWord(C) shr 24] xor
+           Tiger_Data[1, LongWord(C shr 32) shr 8 and $FF] xor
+           Tiger_Data[0, LongWord(C shr 32) shr 24]);
     if I = 1 then B := B shl 2 + B else
       if I = 2 then B := B shl 3 - B
         else B := B shl 3 + B;
 
     A := A xor x4;
-    Dec(B, TTiger_Data(Tiger_Data)[0, LongWord(A)        and $FF] xor
-           TTiger_Data(Tiger_Data)[1, LongWord(A) shr 16 and $FF] xor
-           TTiger_Data(Tiger_Data)[2,          A  shr 32 and $FF] xor
-           TTiger_Data(Tiger_Data)[3, LongWord(A shr 32) shr 16 and $FF]);
-    Inc(C, TTiger_Data(Tiger_Data)[3, LongWord(A) shr  8 and $FF] xor
-           TTiger_Data(Tiger_Data)[2, LongWord(A) shr 24] xor
-           TTiger_Data(Tiger_Data)[1, LongWord(A shr 32) shr 8 and $FF] xor
-           TTiger_Data(Tiger_Data)[0, LongWord(A shr 32) shr 24]);
+    Dec(B, Tiger_Data[0, LongWord(A)        and $FF] xor
+           Tiger_Data[1, LongWord(A) shr 16 and $FF] xor
+           Tiger_Data[2,          A  shr 32 and $FF] xor
+           Tiger_Data[3, LongWord(A shr 32) shr 16 and $FF]);
+    Inc(C, Tiger_Data[3, LongWord(A) shr  8 and $FF] xor
+           Tiger_Data[2, LongWord(A) shr 24] xor
+           Tiger_Data[1, LongWord(A shr 32) shr 8 and $FF] xor
+           Tiger_Data[0, LongWord(A shr 32) shr 24]);
     if I = 1 then C := C shl 2 + C else
       if I = 2 then C := C shl 3 - C
         else C := C shl 3 + C;
 
     B := B xor x5;
-    Dec(C, TTiger_Data(Tiger_Data)[0, LongWord(B)        and $FF] xor
-           TTiger_Data(Tiger_Data)[1, LongWord(B) shr 16 and $FF] xor
-           TTiger_Data(Tiger_Data)[2,          B  shr 32 and $FF] xor
-           TTiger_Data(Tiger_Data)[3, LongWord(B shr 32) shr 16 and $FF]);
-    Inc(A, TTiger_Data(Tiger_Data)[3, LongWord(B) shr  8 and $FF] xor
-           TTiger_Data(Tiger_Data)[2, LongWord(B) shr 24] xor
-           TTiger_Data(Tiger_Data)[1, LongWord(B shr 32) shr 8 and $FF] xor
-           TTiger_Data(Tiger_Data)[0, LongWord(B shr 32) shr 24]);
+    Dec(C, Tiger_Data[0, LongWord(B)        and $FF] xor
+           Tiger_Data[1, LongWord(B) shr 16 and $FF] xor
+           Tiger_Data[2,          B  shr 32 and $FF] xor
+           Tiger_Data[3, LongWord(B shr 32) shr 16 and $FF]);
+    Inc(A, Tiger_Data[3, LongWord(B) shr  8 and $FF] xor
+           Tiger_Data[2, LongWord(B) shr 24] xor
+           Tiger_Data[1, LongWord(B shr 32) shr 8 and $FF] xor
+           Tiger_Data[0, LongWord(B shr 32) shr 24]);
     if I = 1 then A := A shl 2 + A else
       if I = 2 then A := A shl 3 - A
         else A := A shl 3 + A;
 
     C := C xor x6;
-    Dec(A, TTiger_Data(Tiger_Data)[0, LongWord(C)        and $FF] xor
-           TTiger_Data(Tiger_Data)[1, LongWord(C) shr 16 and $FF] xor
-           TTiger_Data(Tiger_Data)[2,          C  shr 32 and $FF] xor
-           TTiger_Data(Tiger_Data)[3, LongWord(C shr 32) shr 16 and $FF]);
-    Inc(B, TTiger_Data(Tiger_Data)[3, LongWord(C) shr  8 and $FF] xor
-           TTiger_Data(Tiger_Data)[2, LongWord(C) shr 24] xor
-           TTiger_Data(Tiger_Data)[1, LongWord(C shr 32) shr 8 and $FF] xor
-           TTiger_Data(Tiger_Data)[0, LongWord(C shr 32) shr 24]);
+    Dec(A, Tiger_Data[0, LongWord(C)        and $FF] xor
+           Tiger_Data[1, LongWord(C) shr 16 and $FF] xor
+           Tiger_Data[2,          C  shr 32 and $FF] xor
+           Tiger_Data[3, LongWord(C shr 32) shr 16 and $FF]);
+    Inc(B, Tiger_Data[3, LongWord(C) shr  8 and $FF] xor
+           Tiger_Data[2, LongWord(C) shr 24] xor
+           Tiger_Data[1, LongWord(C shr 32) shr 8 and $FF] xor
+           Tiger_Data[0, LongWord(C shr 32) shr 24]);
     if I = 1 then B := B shl 2 + B else
       if I = 2 then B := B shl 3 - B
         else B := B shl 3 + B;
 
     A := A xor x7;
-    Dec(B, TTiger_Data(Tiger_Data)[0, LongWord(A)        and $FF] xor
-           TTiger_Data(Tiger_Data)[1, LongWord(A) shr 16 and $FF] xor
-           TTiger_Data(Tiger_Data)[2,          A  shr 32 and $FF] xor
-           TTiger_Data(Tiger_Data)[3, LongWord(A shr 32) shr 16 and $FF]);
-    Inc(C, TTiger_Data(Tiger_Data)[3, LongWord(A) shr  8 and $FF] xor
-           TTiger_Data(Tiger_Data)[2, LongWord(A) shr 24] xor
-           TTiger_Data(Tiger_Data)[1, LongWord(A shr 32) shr 8 and $FF] xor
-           TTiger_Data(Tiger_Data)[0, LongWord(A shr 32) shr 24]);
+    Dec(B, Tiger_Data[0, LongWord(A)        and $FF] xor
+           Tiger_Data[1, LongWord(A) shr 16 and $FF] xor
+           Tiger_Data[2,          A  shr 32 and $FF] xor
+           Tiger_Data[3, LongWord(A shr 32) shr 16 and $FF]);
+    Inc(C, Tiger_Data[3, LongWord(A) shr  8 and $FF] xor
+           Tiger_Data[2, LongWord(A) shr 24] xor
+           Tiger_Data[1, LongWord(A shr 32) shr 8 and $FF] xor
+           Tiger_Data[0, LongWord(A shr 32) shr 24]);
     if I = 1 then C := C shl 2 + C else
       if I = 2 then C := C shl 3 - C
         else C := C shl 3 + C;
@@ -2731,12 +2841,9 @@ procedure THash_Tiger.DoInit;
 begin
   SetRounds(FRounds);
   if FPaddingByte = 0 then FPaddingByte := $01;
-  FDigest[0] := $89ABCDEF;
-  FDigest[1] := $01234567;
-  FDigest[2] := $76543210;
-  FDigest[3] := $FEDCBA98;
-  FDigest[4] := $C3B2E187;
-  FDigest[5] := $F096A5B4;
+  PInt64(@FDigest[0])^ := $0123456789ABCDEF;
+  PInt64(@FDigest[2])^ := $FEDCBA9876543210;
+  PInt64(@FDigest[4])^ := $F096A5B4C3B2E187;
 end;
 
 // .THash_Panama
@@ -2772,6 +2879,9 @@ begin
   DoPull;
   FillChar(FLFSRBuffer, SizeOf(FLFSRBuffer), 0);
   FTap := 0;
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(FDigest, FDigest, DigestSize div 4);
+  {$ENDIF}
 end;
 
 {$IFNDEF THash_Panama_asm}
@@ -2884,7 +2994,14 @@ procedure THash_Panama.DoTransform(Buffer: PLongArray);
 var
   T0,T1,T2,T3 : LongWord;
   PBufB,PTap0,PTap25: PLongArray;
+  {$IFDEF ENDIAN_BIG}
+  BufferBig: array[0..7] of UInt32;
+  {$ENDIF}
 begin
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(Buffer^, BufferBig, 8);
+  Buffer := @BufferBig;
+  {$ENDIF}
   // perform non-linearity stage (GAMMA)
   T0 := FDigest[ 0];
   T1 := FDigest[ 1];
@@ -2992,8 +3109,6 @@ begin
 end;
 
 procedure THashBaseWhirlpool.DoDone;
-var
-  I: Integer;
 begin
   if FPaddingByte = 0 then FPaddingByte := $80;
   FBuffer[FBufferIndex] := FPaddingByte;
@@ -3005,9 +3120,20 @@ begin
     FBufferIndex := 0;
   end;
   FillChar(FBuffer[FBufferIndex], FBufferSize - FBufferIndex, 0);
-  for I := 31 downto 0 do
-    FBuffer[63 - I] := PByteArray(@FCount)[I];
+
+  PLongWord(@FBuffer[32])^ := {$IFDEF ENDIAN_BIG}FCount[7]{$ELSE}SwapLong(FCount[7]){$ENDIF};
+  PLongWord(@FBuffer[36])^ := {$IFDEF ENDIAN_BIG}FCount[6]{$ELSE}SwapLong(FCount[6]){$ENDIF};
+  PLongWord(@FBuffer[40])^ := {$IFDEF ENDIAN_BIG}FCount[5]{$ELSE}SwapLong(FCount[5]){$ENDIF};
+  PLongWord(@FBuffer[44])^ := {$IFDEF ENDIAN_BIG}FCount[4]{$ELSE}SwapLong(FCount[4]){$ENDIF};
+  PLongWord(@FBuffer[48])^ := {$IFDEF ENDIAN_BIG}FCount[3]{$ELSE}SwapLong(FCount[3]){$ENDIF};
+  PLongWord(@FBuffer[52])^ := {$IFDEF ENDIAN_BIG}FCount[2]{$ELSE}SwapLong(FCount[2]){$ENDIF};
+  PLongWord(@FBuffer[56])^ := {$IFDEF ENDIAN_BIG}FCount[1]{$ELSE}SwapLong(FCount[1]){$ENDIF};
+  PLongWord(@FBuffer[60])^ := {$IFDEF ENDIAN_BIG}FCount[0]{$ELSE}SwapLong(FCount[0]){$ENDIF};
+
   DoTransform(Pointer(FBuffer));
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(FDigest, FDigest, DigestSize div 4);
+  {$ENDIF}
 end;
 
 {$IFNDEF THashBaseWhirlpool_asm}
@@ -3154,10 +3280,17 @@ type
 var
   S,L,K: TWhirlData;
   I: Integer;
+  {$IFDEF ENDIAN_BIG}
+  BufferBig: array[0..15] of UInt32;
+  {$ENDIF}
 begin
   Assert(not Odd(Whirlpool_Rounds));
 
   Move(FDigest, K, SizeOf(FDigest));
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(Buffer^, BufferBig, 16);
+  Buffer := @BufferBig;
+  {$ENDIF}
   XORBuffers(FDigest, Buffer[0], SizeOf(FDigest), S);
   // iterate over all rounds
   for I := 0 to Whirlpool_Rounds div 2 - 1 do
@@ -3218,8 +3351,6 @@ begin
 end;
 
 procedure THash_Square.DoDone;
-var
-  I: Integer;
 begin
   if FPaddingByte = 0 then FPaddingByte := $80;
   FBuffer[FBufferIndex] := FPaddingByte;
@@ -3231,9 +3362,12 @@ begin
     FBufferIndex := 0;
   end;
   FillChar(FBuffer[FBufferIndex], FBufferSize - FBufferIndex, 0);
-  for I := 7 downto 0 do
-    FBuffer[15 - I] := PByteArray(@FCount[0])[I];
+  PLongWord(@FBuffer[8])^ := {$IFDEF ENDIAN_BIG}FCount[1]{$ELSE}SwapLong(FCount[1]){$ENDIF};
+  PLongWord(@FBuffer[12])^ := {$IFDEF ENDIAN_BIG}FCount[0]{$ELSE}SwapLong(FCount[0]){$ENDIF};
   DoTransform(Pointer(FBuffer));
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(FDigest, FDigest, DigestSize div 4);
+  {$ENDIF}
 end;
 
 {$IFNDEF THash_Square_asm}
@@ -3243,7 +3377,15 @@ var
   A,B,C,D: LongWord;
   AA,BB,CC,DD: LongWord;
   I: Integer;
+  {$IFDEF ENDIAN_BIG}
+  BufferBig: array[0..3] of UInt32;
+  {$ENDIF}
 begin
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(Buffer^, BufferBig, 4);
+  Buffer := @BufferBig;
+  {$ENDIF}
+
 {Build and expand the Key, Digest include the Key}
   Key[0, 0] := FDigest[0];
   Key[0, 1] := FDigest[1];
@@ -3351,10 +3493,12 @@ begin
     FBufferIndex := 0;
   end;
   FillChar(FBuffer[FBufferIndex], FBufferSize - FBufferIndex, 0);
-  PLongWord(@FBuffer[FBufferSize - 8])^ := SwapLong(FCount[1]);
-  PLongWord(@FBuffer[FBufferSize - 4])^ := SwapLong(FCount[0]);
+  PLongWord(@FBuffer[FBufferSize - 8])^ := {$IFNDEF ENDIAN_BIG}SwapLong(FCount[1]){$ELSE}FCount[1]{$ENDIF};
+  PLongWord(@FBuffer[FBufferSize - 4])^ := {$IFNDEF ENDIAN_BIG}SwapLong(FCount[0]){$ELSE}FCount[0]{$ENDIF};
   DoTransform(Pointer(FBuffer));
+  {$IFNDEF ENDIAN_BIG}
   SwapLongBuffer(FDigest, FDigest, 8);
+  {$ENDIF}
 end;
 
 // .THash_Snefru128
@@ -3377,7 +3521,11 @@ var
   D,Box0,Box1: PLongArray;
 begin
   D := @FDigest;
+  {$IFNDEF ENDIAN_BIG}
   SwapLongBuffer(Buffer[0], D[4], 12);
+  {$ELSE}
+  Move(Buffer[0], D[4], 48);
+  {$ENDIF}
   Move(D[0], D[16], 16);
   Box0 := @Snefru_Data[0];
   Box1 := @Snefru_Data[1];
@@ -3434,7 +3582,11 @@ var
   D,Box0,Box1: PLongArray;
 begin
   D := @FDigest;
+  {$IFNDEF ENDIAN_BIG}
   SwapLongBuffer(Buffer[0], D[8], 8);
+  {$ELSE}
+  Move(Buffer[0], D[8], 32);
+  {$ENDIF}
   Move(D[0], D[16], 32);
   Box0 := @Snefru_Data[0];
   Box1 := @Snefru_Data[1];
@@ -3512,7 +3664,7 @@ procedure THash_Sapphire.DoDone;
 var
   I: Integer;
 begin
-  for I := 255 downto 0 do Calc(I, 1);
+  for I := 255 downto 0 do Calc({$IFNDEF ENDIAN_BIG}I{$ELSE}PByteArray(@I)[3]{$ENDIF}, 1);
   for I := 0 to DigestSize -1 do
   begin
     Calc(#0#0, 1);

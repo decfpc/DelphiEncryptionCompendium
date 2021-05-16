@@ -115,7 +115,7 @@ function RandomSystemTime: Cardinal;
 // reverse byte order of Buffer
 procedure SwapBytes(var Buffer; BufferSize: Integer);
 function SwapLong(Value: LongWord): LongWord;
-procedure SwapLongBuffer(const Source; var Dest; Count: Integer);
+procedure SwapLongBuffer(const Source; out Dest; Count: Integer);
 function SwapInt64(const Value: Int64): Int64;
 procedure SwapInt64Buffer(const Source; var Dest; Count: Integer);
 function SwapBits(Value, Bits: LongWord): LongWord;
@@ -728,7 +728,7 @@ begin
 end;
 {$ENDIF}
 
-procedure SwapLongBuffer(const Source; var Dest; Count: Integer);
+procedure SwapLongBuffer(const Source; out Dest; Count: Integer);
 {$IFDEF UseASM86}
   {$DEFINE SwapLongBuffer_asm}
 {$ENDIF}

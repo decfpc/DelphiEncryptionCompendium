@@ -137,7 +137,7 @@ type
     function ExtractClassName: PAnsiChar;
     procedure ExtractProperty(Instance: TObject);
     function ExtractTestResult: Binary;
-    function ExtractTest(var Data: Binary; var Count: Integer): Boolean;
+    function ExtractTest(out Data: Binary; out Count: Integer): Boolean;
     procedure TestHash;
     procedure TestCipher;
     procedure TestFormat;
@@ -225,7 +225,7 @@ begin
   Result := TFormat_Escape.Decode(R^, StrLen(R));
 end;
 
-function TTestRunner.ExtractTest(var Data: Binary; var Count: Integer): Boolean;
+function TTestRunner.ExtractTest(out Data: Binary; out Count: Integer): Boolean;
 // extract one testcase and repetition
 var
   L: Boolean;
@@ -258,6 +258,7 @@ begin
     Data := TFormat_Escape.Decode(Data);
     if L then
     begin
+      T := '';
       repeat
         T := T + Data;
         Dec(Count);
@@ -280,10 +281,10 @@ begin
   Digest := ExtractTestResult;
   Hash.Init;
   while ExtractTest(Data, Count) do
-  repeat
-    Hash.Calc(Data[1], Length(Data));
-    Dec(Count);
-  until Count <= 0;
+    repeat
+      Hash.Calc(Data[1], Length(Data));
+      Dec(Count);
+    until Count <= 0;
   Hash.Done;
 
   Write(FLineNo:5, ': ', Hash.Classname, ' ');

@@ -503,7 +503,12 @@
 .Password=TCipher_SCOP
 .IFiller=$FF
 .Mode=cmCTSx
-<b1a7ee707aab160af9b9c3ebc2db5ee814a28995d2c1f994c53ca159ee052632>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+<4387128fa638d9f5f9c55cf4c2626228346269ddaebe0965133967bdd205ba3d>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+.Password=TCipher_SCOPTCipher_SCOPTCipher_SCOPTCipher_SCOP
+.IFiller=$FF
+.Mode=cmCTSx
+<865e3a2088c015f6afa56363>=<12bytesbytes>
 
 [TCipher_Sapphire]
 # DEC Version 3.0 Selftest Testvector

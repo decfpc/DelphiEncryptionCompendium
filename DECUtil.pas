@@ -7,8 +7,7 @@
 
   Original Author:  (c) 2006 Hagen Reddmann, HaReddmann [at] T-Online [dot] de
   Modifications:    (c) 2008 Arvid Winkelsdorf, info [at] digivendo [dot] de
-
-  Last change:      19. November 2017
+                    (c) 2017, 2021 decfpc
 
   Description:      Utilities for the DEC
 

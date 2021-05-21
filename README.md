@@ -8,6 +8,7 @@ The following changes have been made with respect to the 2008 release:
 * Un-nested procedures in all places where they were passed as function pointers (which is not portable, not even in Delphi Win64).
 * Modified shift operand for all shl/shr operations to be in range 0-31 (architectures like ARM do not support shifts >= 32).
 * Test cases in DECTest are handled by a class now in order to get rid of an assembly hack to call nested procedures.
+* Made all algorithms compatible with big endian processors via conditional compilation.
 
 The following environments have been tested:
 * Delphi XE2 Win32
@@ -15,6 +16,8 @@ The following environments have been tested:
 * FPC 2.6.4 Linux x86_64
 * FPC 3.1.1 Linux ARM
 * FPC 3.1.1 Win32
+* FPC 3.2.0 Win64
+* FPC 3.2.0 Linux PPC
 
 Technically Delphi 7+ and FPC 2.6+ should be compatible (possibly very minor changes required for old versions).
 
@@ -24,7 +27,7 @@ This project is licensed under a MIT/Freeware license. You are free to use the l
  ## Library overview
 DEC mainly consists of the following units:
 * CPU.pas: Queries information about an x86-based processor (Win32/Win64 only).
-* CRC.pas: Cyclic Redundance Check implementation for many common lengths and polynomials.
+* DECCRC.pas: Cyclic Redundance Check implementation for many common lengths and polynomials.
 * DECCipher.pas: Implementation of symmetric ciphers and most common operation modes.
 * DECFmt.pas: Formatting classes for all common data formats.
 * DECHash.pas: Implementation of hash functions.

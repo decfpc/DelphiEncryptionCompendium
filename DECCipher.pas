@@ -1374,15 +1374,15 @@ begin
   for I := 0 to 8 do
   begin
     DoEncode(@B, @B, SizeOf(B));
-    P[I * 2 + 0] := SwapLong(B[0]);
-    P[I * 2 + 1] := SwapLong(B[1]);
+    P[I * 2 + 0] := {$IFNDEF ENDIAN_BIG}SwapLong(B[0]){$ELSE}B[0]{$ENDIF};
+    P[I * 2 + 1] := {$IFNDEF ENDIAN_BIG}SwapLong(B[1]){$ELSE}B[1]{$ENDIF};
   end;
   for I := 0 to 3 do
     for J := 0 to 127 do
     begin
       DoEncode(@B, @B, SizeOf(B));
-      S[I, J * 2 + 0] := SwapLong(B[0]);
-      S[I, J * 2 + 1] := SwapLong(B[1]);
+      S[I, J * 2 + 0] := {$IFNDEF ENDIAN_BIG}SwapLong(B[0]){$ELSE}B[0]{$ENDIF};
+      S[I, J * 2 + 1] := {$IFNDEF ENDIAN_BIG}SwapLong(B[1]){$ELSE}B[1]{$ENDIF};
     end;
   FillChar(B, SizeOf(B), 0);
 end;
@@ -1444,8 +1444,9 @@ begin
 
   D := FUser;
   P := Pointer(PAnsiChar(FUser) + SizeOf(Blowfish_Data));
-  A := SwapLong(PLongArray(Source)[0]) xor P[0]; P := @P[1];
-  B := SwapLong(PLongArray(Source)[1]);
+  A := {$IFNDEF ENDIAN_BIG}SwapLong(PLongArray(Source)[0]){$ELSE}PLongArray(Source)[0]{$ENDIF} xor P[0];
+  P := @P[1];
+  B := {$IFNDEF ENDIAN_BIG}SwapLong(PLongArray(Source)[1]){$ELSE}PLongArray(Source)[1]{$ENDIF};
   for I := 0 to 7 do
   begin
     B := B xor P[0] xor (D[0, A shr 24        ] +
@@ -1459,8 +1460,8 @@ begin
                          D[3, B        and $FF]);
     P := @P[2];
   end;
-  PLongArray(Dest)[0] := SwapLong(B xor P[0]);
-  PLongArray(Dest)[1] := SwapLong(A);
+  PLongArray(Dest)[0] := {$IFNDEF ENDIAN_BIG}SwapLong(B xor P[0]){$ELSE}B xor P[0]{$ENDIF};
+  PLongArray(Dest)[1] := {$IFNDEF ENDIAN_BIG}SwapLong(A){$ELSE}A{$ENDIF};
 end;
 {$ENDIF}
 
@@ -1518,8 +1519,8 @@ begin
 
   D := FUser;
   P := Pointer(PAnsiChar(FUser) + SizeOf(Blowfish_Data) + SizeOf(Blowfish_Key) - SizeOf(Integer));
-  A := SwapLong(PLongArray(Source)[0]) xor P[0];
-  B := SwapLong(PLongArray(Source)[1]);
+  A := {$IFNDEF ENDIAN_BIG}SwapLong(PLongArray(Source)[0]){$ELSE}PLongArray(Source)[0]{$ENDIF} xor P[0];
+  B := {$IFNDEF ENDIAN_BIG}SwapLong(PLongArray(Source)[1]){$ELSE}PLongArray(Source)[1]{$ENDIF};
   for I := 0 to 7 do
   begin
     Dec(PLongWord(P), 2);
@@ -1533,8 +1534,8 @@ begin
                          D[3, B        and $FF]);
   end;
   Dec(PLongWord(P));
-  PLongArray(Dest)[0] := SwapLong(B xor P[0]);
-  PLongArray(Dest)[1] := SwapLong(A);
+  PLongArray(Dest)[0] := {$IFNDEF ENDIAN_BIG}SwapLong(B xor P[0]){$ELSE}B xor P[0]{$ENDIF};
+  PLongArray(Dest)[1] := {$IFNDEF ENDIAN_BIG}SwapLong(A){$ELSE}A{$ENDIF};
 end;
 {$ENDIF}
 
@@ -1546,7 +1547,11 @@ type
   TLongRec = record
                case Integer of
                  0: (L: Longword);
+                 {$IFNDEF ENDIAN_BIG}
                  1: (A,B,C,D: Byte);
+                 {$ELSE}
+                 1: (D,C,B,A: Byte);
+                 {$ENDIF}
              end;
 
 class function TCipher_Twofish.Context: TCipherContext;
@@ -1635,6 +1640,9 @@ var
     if Size <= 16 then Size := 16 else
       if Size <= 24 then Size := 24
         else Size := 32;
+    {$IFDEF ENDIAN_BIG}
+    SwapLongBuffer(K, K, Size div 4);
+    {$ENDIF}
     J := Size shr 3 - 1;
     for I := 0 to J do
     begin
@@ -1661,7 +1669,7 @@ var
     I: LongWord;
   begin
     Value := (Value and $FF) * $01010101;
-    for I := 0 to 63 do D[I] := S[I] xor Value;
+    for I := 0 to 63 do D[I] := {$IFNDEF ENDIAN_BIG}S[I] xor Value{$ELSE}SwapLong(SwapLong(S[I]) xor Value){$ENDIF};
   end;
 
   procedure SetupBox128;
@@ -1770,10 +1778,10 @@ begin
   Assert(Size = Context.BlockSize);
 
   S   := FUser;
-  A.L := PLongArray(Source)[0] xor S[0];
-  B.L := PLongArray(Source)[1] xor S[1];
-  C.L := PLongArray(Source)[2] xor S[2];
-  D.L := PLongArray(Source)[3] xor S[3];
+  A.L := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[0]{$ELSE}SwapLong(PLongArray(Source)[0]){$ENDIF} xor S[0];
+  B.L := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[1]{$ELSE}SwapLong(PLongArray(Source)[1]){$ENDIF} xor S[1];
+  C.L := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[2]{$ELSE}SwapLong(PLongArray(Source)[2]){$ENDIF} xor S[2];
+  D.L := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[3]{$ELSE}SwapLong(PLongArray(Source)[3]){$ENDIF} xor S[3];
 
   Box := @S[40];
   S   := @S[8];
@@ -1800,6 +1808,9 @@ begin
   PLongArray(Dest)[1] := D.L xor S[5];
   PLongArray(Dest)[2] := A.L xor S[6];
   PLongArray(Dest)[3] := B.L xor S[7];
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(Dest^, Dest^, 4);
+  {$ENDIF}
 end;
 
 procedure TCipher_Twofish.DoDecode(Source, Dest: Pointer; Size: Integer);
@@ -1813,10 +1824,10 @@ begin
 
   S := FUser;
   Box := @S[40];
-  C.L := PLongArray(Source)[0] xor S[4];
-  D.L := PLongArray(Source)[1] xor S[5];
-  A.L := PLongArray(Source)[2] xor S[6];
-  B.L := PLongArray(Source)[3] xor S[7];
+  C.L := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[0]{$ELSE}SwapLong(PLongArray(Source)[0]){$ENDIF} xor S[4];
+  D.L := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[1]{$ELSE}SwapLong(PLongArray(Source)[1]){$ENDIF} xor S[5];
+  A.L := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[2]{$ELSE}SwapLong(PLongArray(Source)[2]){$ENDIF} xor S[6];
+  B.L := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[3]{$ELSE}SwapLong(PLongArray(Source)[3]){$ENDIF} xor S[7];
   S := @S[36];
   for I := 0 to 7 do
   begin
@@ -1841,6 +1852,9 @@ begin
   PLongArray(Dest)[1] := B.L xor S[1];
   PLongArray(Dest)[2] := C.L xor S[2];
   PLongArray(Dest)[3] := D.L xor S[3];
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(Dest^, Dest^, 4);
+  {$ENDIF}
 end;
 
 // .TCipher_IDEA
@@ -1892,7 +1906,7 @@ var
 begin
   E := FUser;
   Move(Key, E^, Size);
-  for I := 0 to 7 do E[I] := Swap(E[I]);
+  for I := 0 to 7 do E[I] := {$IFNDEF ENDIAN_BIG}Swap(E[I]){$ELSE}E[I]{$ENDIF};
   for I := 0 to 39 do
     E[I + 8] := E[I and not 7 + (I + 1) and 7] shl 9 or
                 E[I and not 7 + (I + 2) and 7] shr 7;
@@ -1969,10 +1983,10 @@ var
   I: LongWord;
   X,Y,A,B,C,D: LongWord;
 begin
-  I := SwapLong(Source[0]);
+  I := {$IFNDEF ENDIAN_BIG}SwapLong(Source[0]){$ELSE}Source[0]{$ENDIF};
   A := I shr 16;
   B := I and $FFFF;
-  I := SwapLong(Source[1]);
+  I := {$IFNDEF ENDIAN_BIG}SwapLong(Source[1]){$ELSE}Source[1]{$ENDIF};
   C := I shr 16;
   D := I and $FFFF;
   for I := 0 to 7 do
@@ -1993,8 +2007,8 @@ begin
     C := Y;
     Key := @Key[6];
   end;
-  Dest[0] := SwapLong(IDEAMul(A, Key[0]) shl 16 or (C + Key[1]) and $FFFF);
-  Dest[1] := SwapLong((B + Key[2]) shl 16 or IDEAMul(D, Key[3]) and $FFFF);
+  Dest[0] := {$IFNDEF ENDIAN_BIG}SwapLong({$ENDIF}IDEAMul(A, Key[0]) shl 16 or (C + Key[1]) and $FFFF{$IFNDEF ENDIAN_BIG}){$ENDIF};
+  Dest[1] := {$IFNDEF ENDIAN_BIG}SwapLong({$ENDIF}(B + Key[2]) shl 16 or IDEAMul(D, Key[3]) and $FFFF{$IFNDEF ENDIAN_BIG}){$ENDIF};
 end;
 
 procedure TCipher_IDEA.DoEncode(Source, Dest: Pointer; Size: Integer);
@@ -2030,7 +2044,9 @@ var
 begin
   FillChar(X, SizeOf(X), 0);
   Move(Key, X, Size);
+  {$IFNDEF ENDIAN_BIG}
   SwapLongBuffer(X, X, 8);
+  {$ENDIF}
   K := FUser;
   M := $5A827999;
   R := 19;
@@ -2138,11 +2154,18 @@ begin
   Assert(Size = Context.BlockSize);
 
   K := FUser;
+  {$IFNDEF ENDIAN_BIG}
   SwapLongBuffer(Source^, Dest^, 4);
   A := PLongArray(Dest)[0];
   B := PLongArray(Dest)[1];
   C := PLongArray(Dest)[2];
   D := PLongArray(Dest)[3];
+  {$ELSE}
+  A := PLongArray(Source)[0];
+  B := PLongArray(Source)[1];
+  C := PLongArray(Source)[2];
+  D := PLongArray(Source)[3];
+  {$ENDIF}
   for I := 0 to 5 do
   begin
     T := K[0] + D;
@@ -2203,7 +2226,9 @@ begin
   PLongArray(Dest)[1] := B;
   PLongArray(Dest)[2] := C;
   PLongArray(Dest)[3] := D;
+  {$IFNDEF ENDIAN_BIG}
   SwapLongBuffer(Dest^, Dest^, 4);
+  {$ENDIF}
 end;
 
 procedure TCipher_Cast256.DoDecode(Source, Dest: Pointer; Size: Integer);
@@ -2214,11 +2239,18 @@ begin
   Assert(Size = Context.BlockSize);
 
   K := @PLongArray(FUser)[44];
+  {$IFNDEF ENDIAN_BIG}
   SwapLongBuffer(Source^, Dest^, 4);
   A := PLongArray(Dest)[0];
   B := PLongArray(Dest)[1];
   C := PLongArray(Dest)[2];
   D := PLongArray(Dest)[3];
+  {$ELSE}
+  A := PLongArray(Source)[0];
+  B := PLongArray(Source)[1];
+  C := PLongArray(Source)[2];
+  D := PLongArray(Source)[3];
+  {$ENDIF}
   for I := 0 to 5 do
   begin
     T := K[3] + D;
@@ -2279,7 +2311,9 @@ begin
   PLongArray(Dest)[1] := B;
   PLongArray(Dest)[2] := C;
   PLongArray(Dest)[3] := D;
+  {$IFNDEF ENDIAN_BIG}
   SwapLongBuffer(Dest^, Dest^, 4);
+  {$ENDIF}
 end;
 
 // .TCipher_Mars
@@ -2332,7 +2366,11 @@ begin
   K := FUser;
   B := @Mars_Data;
   FillChar(T, SizeOf(T), 0);
+  {$IFNDEF ENDIAN_BIG}
   Move(Key, T, Size);
+  {$ELSE}
+  SwapLongBuffer(Key, T, Size div 4);
+  {$ENDIF}
   Size := Size div 4;
   T[Size] := Size;
   for J := 0 to 3 do
@@ -2370,10 +2408,10 @@ begin
   Assert(Size = Context.BlockSize);
 
   K := FUser;
-  A := PLongArray(Source)[0] + K[0];
-  B := PLongArray(Source)[1] + K[1];
-  C := PLongArray(Source)[2] + K[2];
-  D := PLongArray(Source)[3] + K[3];
+  A := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[0]{$ELSE}SwapLong(PLongArray(Source)[0]){$ENDIF} + K[0];
+  B := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[1]{$ELSE}SwapLong(PLongArray(Source)[1]){$ENDIF} + K[1];
+  C := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[2]{$ELSE}SwapLong(PLongArray(Source)[2]){$ENDIF} + K[2];
+  D := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[3]{$ELSE}SwapLong(PLongArray(Source)[3]){$ENDIF} + K[3];
   K := @K[4];
   for I := 0 to 1 do
   begin
@@ -2496,10 +2534,10 @@ begin
     C := C - Mars_Data[D shr 16 and $FF + 256] xor Mars_Data[D shr 8 and $FF];
     D := D shl 24 or D shr 8;
   end;
-  PLongArray(Dest)[0] := A - K[0];
-  PLongArray(Dest)[1] := B - K[1];
-  PLongArray(Dest)[2] := C - K[2];
-  PLongArray(Dest)[3] := D - K[3];
+  PLongArray(Dest)[0] := {$IFNDEF ENDIAN_BIG}A - K[0]{$ELSE}SwapLong(A - K[0]){$ENDIF};
+  PLongArray(Dest)[1] := {$IFNDEF ENDIAN_BIG}B - K[1]{$ELSE}SwapLong(B - K[1]){$ENDIF};
+  PLongArray(Dest)[2] := {$IFNDEF ENDIAN_BIG}C - K[2]{$ELSE}SwapLong(C - K[2]){$ENDIF};
+  PLongArray(Dest)[3] := {$IFNDEF ENDIAN_BIG}D - K[3]{$ELSE}SwapLong(D - K[3]){$ENDIF};
 end;
 
 procedure TCipher_Mars.DoDecode(Source, Dest: Pointer; Size: Integer);
@@ -2510,10 +2548,10 @@ begin
   Assert(Size = Context.BlockSize);
 
   K := @PLongArray(FUser)[28];
-  A := PLongArray(Source)[0] + K[8];
-  B := PLongArray(Source)[1] + K[9];
-  C := PLongArray(Source)[2] + K[10];
-  D := PLongArray(Source)[3] + K[11];
+  A := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[0]{$ELSE}SwapLong(PLongArray(Source)[0]){$ENDIF} + K[8];
+  B := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[1]{$ELSE}SwapLong(PLongArray(Source)[1]){$ENDIF} + K[9];
+  C := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[2]{$ELSE}SwapLong(PLongArray(Source)[2]){$ENDIF} + K[10];
+  D := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[3]{$ELSE}SwapLong(PLongArray(Source)[3]){$ENDIF} + K[11];
   for I := 0 to 1 do
   begin
     D := D shr 24 or D shl 8;
@@ -2636,6 +2674,9 @@ begin
   PLongArray(Dest)[1] := B - K[5];
   PLongArray(Dest)[2] := C - K[6];
   PLongArray(Dest)[3] := D - K[7];
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(Dest^, Dest^, 4);
+  {$ENDIF}
 end;
 
 // .TCipher_RC4
@@ -2733,11 +2774,15 @@ begin
     if FRounds < 16 then FRounds := 16 else
       if FRounds > 24 then FRounds := 24;
   D := FUser;
-  FillChar(K, SizeOf(K), 0);
-  Move(Key, K, Size);
   L := Size shr 2;
   if Size and 3 <> 0 then Inc(L);
   if L <= 0 then L := 1;
+  FillChar(K, SizeOf(K), 0);
+  {$IFNDEF ENDIAN_BIG}
+  Move(Key, K, Size);
+  {$ELSE}
+  SwapLongBuffer(Key, K, L);
+  {$ENDIF}
   J := $B7E15163;
   for I := 0 to (FRounds + 2) * 2 do
   begin
@@ -2825,10 +2870,10 @@ begin
   Assert(Size = Context.BlockSize);
 
   K := FUser;
-  A := PLongArray(Source)[0];
-  B := PLongArray(Source)[1] + K[0];
-  C := PLongArray(Source)[2];
-  D := PLongArray(Source)[3] + K[1];
+  A := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[0]{$ELSE}SwapLong(PLongArray(Source)[0]){$ENDIF};
+  B := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[1]{$ELSE}SwapLong(PLongArray(Source)[1]){$ENDIF} + K[0];
+  C := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[2]{$ELSE}SwapLong(PLongArray(Source)[2]){$ENDIF};
+  D := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[3]{$ELSE}SwapLong(PLongArray(Source)[3]){$ENDIF} + K[1];
   for I := 1 to FRounds do
   begin
     K := @K[2];
@@ -2846,6 +2891,9 @@ begin
   PLongArray(Dest)[1] := B;
   PLongArray(Dest)[2] := C + K[3];
   PLongArray(Dest)[3] := D;
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(Dest^, Dest^, 4);
+  {$ENDIF}
 end;
 {$ENDIF}
 
@@ -2908,10 +2956,10 @@ begin
   Assert(Size = Context.BlockSize);
 
   K := @PLongArray(FUser)[FRounds * 2];
-  A := PLongArray(Source)[0] - K[2];
-  B := PLongArray(Source)[1];
-  C := PLongArray(Source)[2] - K[3];
-  D := PLongArray(Source)[3];
+  A := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[0]{$ELSE}SwapLong(PLongArray(Source)[0]){$ENDIF} - K[2];
+  B := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[1]{$ELSE}SwapLong(PLongArray(Source)[1]){$ENDIF};
+  C := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[2]{$ELSE}SwapLong(PLongArray(Source)[2]){$ENDIF} - K[3];
+  D := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[3]{$ELSE}SwapLong(PLongArray(Source)[3]){$ENDIF};
   for I := 1 to FRounds do
   begin
     T := A; A := D; D := C; C := B; B := T;
@@ -2929,6 +2977,9 @@ begin
   PLongArray(Dest)[1] := B - K[0];
   PLongArray(Dest)[2] := C;
   PLongArray(Dest)[3] := D - K[1];
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(Dest^, Dest^, 4);
+  {$ENDIF}
 end;
 {$ENDIF}
 
@@ -3124,6 +3175,9 @@ begin
       else FRounds := 14;
   FillChar(FUser^, 32, 0);       
   Move(Key, FUser^, Size);
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(FUser^, FUser^, 8);
+  {$ENDIF}
   BuildEncodeKey;
   BuildDecodeKey;
 end;
@@ -3137,10 +3191,10 @@ var
 begin
   Assert(Size = Context.BlockSize);
   P  := FUser;
-  A1 := PLongArray(Source)[0];
-  B1 := PLongArray(Source)[1];
-  C1 := PLongArray(Source)[2];
-  D1 := PLongArray(Source)[3];
+  A1 := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[0]{$ELSE}SwapLong(PLongArray(Source)[0]){$ENDIF};
+  B1 := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[1]{$ELSE}SwapLong(PLongArray(Source)[1]){$ENDIF};
+  C1 := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[2]{$ELSE}SwapLong(PLongArray(Source)[2]){$ENDIF};
+  D1 := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[3]{$ELSE}SwapLong(PLongArray(Source)[3]){$ENDIF};
   for I := 2 to FRounds do
   begin
     A2 := A1 xor P[0];
@@ -3189,6 +3243,9 @@ begin
                           Rijndael_S[0, A2 shr  8 and $FF] shl  8 or
                           Rijndael_S[0, B2 shr 16 and $FF] shl 16 or
                           Rijndael_S[0, C2 shr 24        ] shl 24)     xor P[7];
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(Dest^, Dest^, 4);
+  {$ENDIF}
 end;
 
 procedure TCipher_Rijndael.DoDecode(Source, Dest: Pointer; Size: Integer);
@@ -3201,10 +3258,10 @@ begin
   Assert(Size = Context.BlockSize);
 
   P  := Pointer(PAnsiChar(FUser) + FUserSize shr 1 + FRounds * 16);
-  A1 := PLongArray(Source)[0];
-  B1 := PLongArray(Source)[1];
-  C1 := PLongArray(Source)[2];
-  D1 := PLongArray(Source)[3];
+  A1 := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[0]{$ELSE}SwapLong(PLongArray(Source)[0]){$ENDIF};
+  B1 := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[1]{$ELSE}SwapLong(PLongArray(Source)[1]){$ENDIF};
+  C1 := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[2]{$ELSE}SwapLong(PLongArray(Source)[2]){$ENDIF};
+  D1 := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[3]{$ELSE}SwapLong(PLongArray(Source)[3]){$ENDIF};
 
   for I := 2 to FRounds do
   begin
@@ -3256,6 +3313,9 @@ begin
                           Rijndael_S[1, C2 shr  8 and $FF] shl  8 or
                           Rijndael_S[1, B2 shr 16 and $FF] shl 16 or
                           Rijndael_S[1, A2 shr 24]         shl 24)    xor P[3];
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(Dest^, Dest^, 4);
+  {$ENDIF}
 end;
 
 // .TCipher_Square
@@ -3279,7 +3339,14 @@ var
 begin
   E := FUser;
   D := FUser; Inc(D);
+  {$IFNDEF ENDIAN_BIG}
   Move(Key, E^, Size);
+  {$ELSE}
+  I := Size div 4;
+  if Size and 3 <> 0 then Inc(I);
+  if I <= 0 then I := 1;
+  SwapLongBuffer(Key, E^, I);
+  {$ENDIF}
   for I := 1 to 8 do
   begin
     T := E[I -1, 3];
@@ -3322,10 +3389,10 @@ var
   I: Integer;
 begin
   Key := FUser;
-  A := PLongArray(Source)[0] xor Key[0];
-  B := PLongArray(Source)[1] xor Key[1];
-  C := PLongArray(Source)[2] xor Key[2];
-  D := PLongArray(Source)[3] xor Key[3];
+  A := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[0]{$ELSE}SwapLong(PLongArray(Source)[0]){$ENDIF} xor Key[0];
+  B := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[1]{$ELSE}SwapLong(PLongArray(Source)[1]){$ENDIF} xor Key[1];
+  C := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[2]{$ELSE}SwapLong(PLongArray(Source)[2]){$ENDIF} xor Key[2];
+  D := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[3]{$ELSE}SwapLong(PLongArray(Source)[3]){$ENDIF} xor Key[3];
   Key := @Key[4];
   for I := 0 to 6 do
   begin
@@ -3367,6 +3434,9 @@ begin
                          LongWord(Square_SE[B shr 24        ]) shl  8 xor
                          LongWord(Square_SE[C shr 24        ]) shl 16 xor
                          LongWord(Square_SE[D shr 24        ]) shl 24 xor Key[3];
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(Dest^, Dest^, 4);
+  {$ENDIF}
 end;
 
 procedure TCipher_Square.DoDecode(Source, Dest: Pointer; Size: Integer);
@@ -3377,10 +3447,10 @@ var
   I: Integer;
 begin
   Key := @PLongArray(FUser)[9 * 4];
-  A := PLongArray(Source)[0] xor Key[0];
-  B := PLongArray(Source)[1] xor Key[1];
-  C := PLongArray(Source)[2] xor Key[2];
-  D := PLongArray(Source)[3] xor Key[3];
+  A := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[0]{$ELSE}SwapLong(PLongArray(Source)[0]){$ENDIF} xor Key[0];
+  B := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[1]{$ELSE}SwapLong(PLongArray(Source)[1]){$ENDIF} xor Key[1];
+  C := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[2]{$ELSE}SwapLong(PLongArray(Source)[2]){$ENDIF} xor Key[2];
+  D := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[3]{$ELSE}SwapLong(PLongArray(Source)[3]){$ENDIF} xor Key[3];
   Key := @Key[4];
   for I := 0 to 6 do
   begin
@@ -3421,6 +3491,9 @@ begin
                          LongWord(Square_SD[B shr 24        ]) shl  8 xor
                          LongWord(Square_SD[C shr 24        ]) shl 16 xor
                          LongWord(Square_SD[D shr 24        ]) shl 24 xor Key[3];
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(Dest^, Dest^, 4);
+  {$ENDIF}
 end;
 {$IFDEF FPC}{$pop}{$ENDIF}
 
@@ -3457,6 +3530,10 @@ var
         P[I] := C;
         Inc(C);
       end;
+
+    {$IFDEF ENDIAN_BIG}
+    SwapLongBuffer(Init_State.X, Init_State.X, 4);
+    {$ENDIF}
   end;
 
   procedure GP8(Data: PLongArray);
@@ -3538,7 +3615,11 @@ begin
   begin
     T1 := P[J + 3 + 128]; Inc(J, T3);
     T2 := P[J + 3 + 128];
+    {$IFNDEF ENDIAN_BIG}
     PLongArray(Dest)[W] := PLongArray(Source)[W] + T1 + T2;
+    {$ELSE}
+    PLongArray(Dest)[W] := SwapLong(SwapLong(PLongArray(Source)[W]) + T1 + T2);
+    {$ENDIF}
     T3 := T2 + P[I + 3];  Inc(I);
     P[J + 3 + 128] := T3;
     Inc(J, T2);
@@ -3563,7 +3644,11 @@ begin
   begin
     T1 := P[J + 3 + 128]; Inc(J, T3);
     T2 := P[J + 3 + 128];
+    {$IFNDEF ENDIAN_BIG}
     PLongArray(Dest)[W] := PLongArray(Source)[W] - T1 - T2;
+    {$ELSE}
+    PLongArray(Dest)[W] := SwapLong(SwapLong(PLongArray(Source)[W]) - T1 - T2);
+    {$ENDIF}
     T3 := T2 + P[I + 3];
     Inc(I);
     P[J + 3 + 128] := T3;
@@ -3708,8 +3793,8 @@ procedure DES_Func(Source, Dest, Key: PLongArray);
 var
   L,R,X,Y,I: LongWord;
 begin
-  L := SwapLong(Source[0]);
-  R := SwapLong(Source[1]);
+  L := {$IFNDEF ENDIAN_BIG}SwapLong(Source[0]){$ELSE}Source[0]{$ENDIF};
+  R := {$IFNDEF ENDIAN_BIG}SwapLong(Source[1]){$ELSE}Source[1]{$ENDIF};
 
   X := (L shr  4 xor R) and $0F0F0F0F; R := R xor X; L := L xor X shl  4;
   X := (L shr 16 xor R) and $0000FFFF; R := R xor X; L := L xor X shl 16;
@@ -3751,8 +3836,8 @@ begin
   X := (R shr 16 xor L) and $0000FFFF; L := L xor X; R := R xor X shl 16;
   X := (R shr  4 xor L) and $0F0F0F0F; L := L xor X; R := R xor X shl  4;
 
-  Dest[0] := SwapLong(R);
-  Dest[1] := SwapLong(L);
+  Dest[0] := {$IFNDEF ENDIAN_BIG}SwapLong(R){$ELSE}R{$ENDIF};
+  Dest[1] := {$IFNDEF ENDIAN_BIG}SwapLong(L){$ELSE}L{$ENDIF};
 end;
 
 // .TCipher_1DES
@@ -4115,8 +4200,13 @@ var
 begin
   with P3Way_Key(FUser)^ do
   begin
+    {$IFNDEF ENDIAN_BIG}
     Move(Key, E_Key, Size);
     Move(Key, D_Key, Size);
+    {$ELSE}
+    SwapLongBuffer(Key, E_Key, 3);
+    SwapLongBuffer(Key, D_Key, 3);
+    {$ENDIF}
     RANDGenerate($0B0B, E_Data);
     RANDGenerate($B1B1, D_Data);
     A0 := D_Key[0];
@@ -4154,9 +4244,9 @@ begin
     K2 := E_Key[2];
     E  := @E_Data;
   end;
-  A0 := PLongArray(Source)[0];
-  A1 := PLongArray(Source)[1];
-  A2 := PLongArray(Source)[2];
+  A0 := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[0]{$ELSE}SwapLong(PLongArray(Source)[0]){$ENDIF};
+  A1 := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[1]{$ELSE}SwapLong(PLongArray(Source)[1]){$ENDIF};
+  A2 := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[2]{$ELSE}SwapLong(PLongArray(Source)[2]){$ENDIF};
   for I := 0 to 10 do
   begin
     A0 := A0 xor K0 xor E^ shl 16;
@@ -4193,6 +4283,9 @@ begin
   PLongArray(Dest)[2] := A2 xor A2 shr 16 xor A0 shl 16 xor A0 shr 16 xor A1 shl 16 xor
                                 A0 shr 24 xor A1 shl  8 xor A1 shr  8 xor A2 shl 24 xor
                                 A1 shr 16 xor A2 shl 16 xor A1 shr 24 xor A2 shl  8;
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(Dest^, Dest^, 3);
+  {$ENDIF}
 end;
 
 procedure TCipher_3Way.DoDecode(Source, Dest: Pointer; Size: Integer);
@@ -4212,9 +4305,9 @@ begin
     K2 := D_Key[2];
     E  := @D_Data;
   end;
-  A0 := SwapBits(PLongArray(Source)[2], 0);
-  A1 := SwapBits(PLongArray(Source)[1], 0);
-  A2 := SwapBits(PLongArray(Source)[0], 0);
+  A0 := SwapBits({$IFNDEF ENDIAN_BIG}PLongArray(Source)[2]{$ELSE}SwapLong(PLongArray(Source)[2]){$ENDIF}, 0);
+  A1 := SwapBits({$IFNDEF ENDIAN_BIG}PLongArray(Source)[1]{$ELSE}SwapLong(PLongArray(Source)[1]){$ENDIF}, 0);
+  A2 := SwapBits({$IFNDEF ENDIAN_BIG}PLongArray(Source)[0]{$ELSE}SwapLong(PLongArray(Source)[0]){$ENDIF}, 0);
   for I := 0 to 10 do
   begin
     A0 := A0 xor K0 xor E^ shl 16;
@@ -4255,6 +4348,9 @@ begin
   PLongArray(Dest)[2] := SwapBits(B0, 0);
   PLongArray(Dest)[1] := SwapBits(B1, 0);
   PLongArray(Dest)[0] := SwapBits(B2, 0);
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(Dest^, Dest^, 3);
+  {$ENDIF}
 end;
 
 
@@ -4291,7 +4387,9 @@ begin
   K := FUser;
   FillChar(X, SizeOf(X), 0);
   Move(Key, X, Size);
+  {$IFNDEF ENDIAN_BIG}
   SwapLongBuffer(X, X, 4);
+  {$ENDIF}
   I := 0;
   while I < 32 do
   begin
@@ -4437,8 +4535,8 @@ begin
   Assert(Size = Context.BufferSize);
   
   K := FUser;
-  A := SwapLong(PLongArray(Source)[0]);
-  B := SwapLong(PLongArray(Source)[1]);
+  A := {$IFNDEF ENDIAN_BIG}SwapLong(PLongArray(Source)[0]){$ELSE}PLongArray(Source)[0]{$ENDIF};
+  B := {$IFNDEF ENDIAN_BIG}SwapLong(PLongArray(Source)[1]){$ELSE}PLongArray(Source)[1]{$ENDIF};
   for I := 0 to 2 do
   begin
     T := K[0] + B;
@@ -4481,8 +4579,8 @@ begin
     if (I = 1) and (FRounds <= 12) then Break;
     K := @K[6];
   end;
-  PLongArray(Dest)[0] := SwapLong(B);
-  PLongArray(Dest)[1] := SwapLong(A);
+  PLongArray(Dest)[0] := {$IFNDEF ENDIAN_BIG}SwapLong(B){$ELSE}B{$ENDIF};
+  PLongArray(Dest)[1] := {$IFNDEF ENDIAN_BIG}SwapLong(A){$ELSE}A{$ENDIF};
 end;
 
 procedure TCipher_Cast128.DoDecode(Source, Dest: Pointer; Size: Integer);
@@ -4495,8 +4593,8 @@ begin
   Assert(Size = Context.BufferSize);
 
   K := @PLongArray(FUser)[12];
-  B := SwapLong(PLongArray(Source)[0]);
-  A := SwapLong(PLongArray(Source)[1]);
+  B := {$IFNDEF ENDIAN_BIG}SwapLong(PLongArray(Source)[0]){$ELSE}PLongArray(Source)[0]{$ENDIF};
+  A := {$IFNDEF ENDIAN_BIG}SwapLong(PLongArray(Source)[1]){$ELSE}PLongArray(Source)[1]{$ENDIF};
   I := 2;
   if FRounds <= 12 then Dec(PLongWord(K), 6)
     else goto Start;
@@ -4542,8 +4640,8 @@ Start:
                 Cast128_Data[3, T and $FF]);
     Dec(PLongWord(K), 6);
   end;
-  PLongArray(Dest)[0] := SwapLong(A);
-  PLongArray(Dest)[1] := SwapLong(B);
+  PLongArray(Dest)[0] := {$IFNDEF ENDIAN_BIG}SwapLong(A){$ELSE}A{$ENDIF};
+  PLongArray(Dest)[1] := {$IFNDEF ENDIAN_BIG}SwapLong(B){$ELSE}B{$ENDIF};
 end;
 
 // .TCipher_Gost
@@ -4559,6 +4657,9 @@ end;
 procedure TCipher_Gost.DoInit(const Key; Size: Integer);
 begin
   Move(Key, FUser^, Size);
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(FUser^, FUser^, 8);
+  {$ENDIF}
 end;
 
 procedure TCipher_Gost.DoEncode(Source, Dest: Pointer; Size: Integer);
@@ -4569,8 +4670,8 @@ begin
   Assert(Size = Context.BufferSize);
 
   K := FUser;
-  A := PLongArray(Source)[0];
-  B := PLongArray(Source)[1];
+  A := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[0]{$ELSE}SwapLong(PLongArray(Source)[0]){$ENDIF};
+  B := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[1]{$ELSE}SwapLong(PLongArray(Source)[1]){$ENDIF};
   for I := 0 to 11 do
   begin
     if I and 3 = 0 then K := FUser;
@@ -4601,8 +4702,8 @@ begin
                Gost_Data[3, T shr 24        ];
     Dec(PLongWord(K), 2);
   end;
-  PLongArray(Dest)[0] := B;
-  PLongArray(Dest)[1] := A;
+  PLongArray(Dest)[0] := {$IFNDEF ENDIAN_BIG}B{$ELSE}SwapLong(B){$ENDIF};
+  PLongArray(Dest)[1] := {$IFNDEF ENDIAN_BIG}A{$ELSE}SwapLong(A){$ENDIF};
 end;
 
 procedure TCipher_Gost.DoDecode(Source, Dest: Pointer; Size: Integer);
@@ -4612,8 +4713,8 @@ var
 begin
   Assert(Size = Context.BufferSize);
 
-  A := PLongArray(Source)[0];
-  B := PLongArray(Source)[1];
+  A := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[0]{$ELSE}SwapLong(PLongArray(Source)[0]){$ENDIF};
+  B := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[1]{$ELSE}SwapLong(PLongArray(Source)[1]){$ENDIF};
   K := FUser;
   for I := 0 to 3 do
   begin
@@ -4644,8 +4745,8 @@ begin
                Gost_Data[3, T shr 24];
     Dec(PLongWord(K), 2);
   end;
-  PLongArray(Dest)[0] := B;
-  PLongArray(Dest)[1] := A;
+  PLongArray(Dest)[0] := {$IFNDEF ENDIAN_BIG}B{$ELSE}SwapLong(B){$ENDIF};
+  PLongArray(Dest)[1] := {$IFNDEF ENDIAN_BIG}A{$ELSE}SwapLong(A){$ENDIF};
 end;
 
 // .TCipher_Misty
@@ -4737,8 +4838,8 @@ var
 begin
   Assert(Size = Context.BufferSize);
 
-  A := PLongArray(Source)[0];
-  B := PLongArray(Source)[1];
+  A := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[0]{$ELSE}SwapLong(PLongArray(Source)[0]){$ENDIF};
+  B := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[1]{$ELSE}SwapLong(PLongArray(Source)[1]){$ENDIF};
   A := Misty_E(A, 0, FUser);
   B := Misty_E(B, 1, FUser) xor Misty_O(A, 0, FUser);
   A := A xor Misty_O(B, 1, FUser);
@@ -4751,8 +4852,8 @@ begin
   A := Misty_E(A, 6, FUser);
   B := Misty_E(B, 7, FUser) xor Misty_O(A, 6, FUser);
   A := A xor Misty_O(B, 7, FUser);
-  PLongArray(Dest)[0] := Misty_E(B, 9, FUser);
-  PLongArray(Dest)[1] := Misty_E(A, 8, FUser);
+  PLongArray(Dest)[0] := {$IFNDEF ENDIAN_BIG}Misty_E(B, 9, FUser){$ELSE}SwapLong(Misty_E(B, 9, FUser)){$ENDIF};
+  PLongArray(Dest)[1] := {$IFNDEF ENDIAN_BIG}Misty_E(A, 8, FUser){$ELSE}SwapLong(Misty_E(A, 8, FUser)){$ENDIF};
 end;
 
 procedure TCipher_Misty.DoDecode(Source, Dest: Pointer; Size: Integer);
@@ -4761,8 +4862,8 @@ var
 begin
   Assert(Size = Context.BufferSize);
 
-  B := Misty_D(PLongArray(Source)[0], 9, FUser);
-  A := Misty_D(PLongArray(Source)[1], 8, FUser);
+  B := Misty_D({$IFNDEF ENDIAN_BIG}PLongArray(Source)[0]{$ELSE}SwapLong(PLongArray(Source)[0]){$ENDIF}, 9, FUser);
+  A := Misty_D({$IFNDEF ENDIAN_BIG}PLongArray(Source)[1]{$ELSE}SwapLong(PLongArray(Source)[1]){$ENDIF}, 8, FUser);
   A := A xor Misty_O(B, 7, FUser);
   B := Misty_D(B xor Misty_O(A, 6, FUser), 7, FUser);
   A := Misty_D(A, 6, FUser);
@@ -4773,8 +4874,8 @@ begin
   B := Misty_D(B xor Misty_O(A, 2, FUser), 3, FUser);
   A := Misty_D(A, 2, FUser);
   A := A xor Misty_O(B, 1, FUser);
-  PLongArray(Dest)[0] := Misty_D(A, 0, FUser);
-  PLongArray(Dest)[1] := Misty_D(B xor Misty_O(A, 0, FUser), 1, FUser);
+  PLongArray(Dest)[0] := {$IFNDEF ENDIAN_BIG}Misty_D(A, 0, FUser){$ELSE}SwapLong(Misty_D(A, 0, FUser)){$ENDIF};
+  PLongArray(Dest)[1] := {$IFNDEF ENDIAN_BIG}Misty_D(B xor Misty_O(A, 0, FUser), 1, FUser){$ELSE}SwapLong(Misty_D(B xor Misty_O(A, 0, FUser), 1, FUser)){$ENDIF};
 end;
 
 // .TCipher_NewDES
@@ -4888,6 +4989,9 @@ var
 begin
   FillChar(K, SizeOf(K), 0);
   Move(Key, K, Size);
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(K, K, 4);
+  {$ENDIF}
   D := FUser;
   for I := 19 downto 1 do
   begin
@@ -4967,10 +5071,10 @@ begin
   Assert(Size = Context.BufferSize);
 
   D  := FUser;
-  B0 := PLongArray(Source)[0];
-  B1 := PLongArray(Source)[1];
-  B2 := PLongArray(Source)[2];
-  B3 := PLongArray(Source)[3];
+  B0 := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[0]{$ELSE}SwapLong(PLongArray(Source)[0]){$ENDIF};
+  B1 := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[1]{$ELSE}SwapLong(PLongArray(Source)[1]){$ENDIF};
+  B2 := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[2]{$ELSE}SwapLong(PLongArray(Source)[2]){$ENDIF};
+  B3 := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[3]{$ELSE}SwapLong(PLongArray(Source)[3]){$ENDIF};
   for I := 0 to 15 do
   begin
     B1 := B1 xor (Q128_Data[B0 and $03FF] + D[0]); B0 := B0 shl 10 or B0 shr 22;
@@ -4979,10 +5083,10 @@ begin
     B0 := B0 xor (Q128_Data[B3 and $03FF] + D[3]); B3 := B3 shl 10 or B3 shr 22;
     D := @D[4];
   end;
-  PLongArray(Dest)[0] := B0;
-  PLongArray(Dest)[1] := B1;
-  PLongArray(Dest)[2] := B2;
-  PLongArray(Dest)[3] := B3;
+  PLongArray(Dest)[0] := {$IFNDEF ENDIAN_BIG}B0{$ELSE}SwapLong(B0){$ENDIF};
+  PLongArray(Dest)[1] := {$IFNDEF ENDIAN_BIG}B1{$ELSE}SwapLong(B1){$ENDIF};
+  PLongArray(Dest)[2] := {$IFNDEF ENDIAN_BIG}B2{$ELSE}SwapLong(B2){$ENDIF};
+  PLongArray(Dest)[3] := {$IFNDEF ENDIAN_BIG}B3{$ELSE}SwapLong(B3){$ENDIF};
 end;
 {$ENDIF}
 
@@ -5046,10 +5150,10 @@ begin
   Assert(Size = Context.BufferSize);
 
   D  := @PLongArray(FUser)[60];
-  B0 := PLongArray(Source)[0];
-  B1 := PLongArray(Source)[1];
-  B2 := PLongArray(Source)[2];
-  B3 := PLongArray(Source)[3];
+  B0 := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[0]{$ELSE}SwapLong(PLongArray(Source)[0]){$ENDIF};
+  B1 := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[1]{$ELSE}SwapLong(PLongArray(Source)[1]){$ENDIF};
+  B2 := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[2]{$ELSE}SwapLong(PLongArray(Source)[2]){$ENDIF};
+  B3 := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[3]{$ELSE}SwapLong(PLongArray(Source)[3]){$ENDIF};
   for I := 0 to 15 do
   begin
     B3 := B3 shr 10 or B3 shl 22; B0 := B0 xor (Q128_Data[B3 and $03FF] + D[3]);
@@ -5058,10 +5162,10 @@ begin
     B0 := B0 shr 10 or B0 shl 22; B1 := B1 xor (Q128_Data[B0 and $03FF] + D[0]);
     Dec(PLongWord(D), 4);
   end;
-  PLongArray(Dest)[0] := B0;
-  PLongArray(Dest)[1] := B1;
-  PLongArray(Dest)[2] := B2;
-  PLongArray(Dest)[3] := B3;
+  PLongArray(Dest)[0] := {$IFNDEF ENDIAN_BIG}B0{$ELSE}SwapLong(B0){$ENDIF};
+  PLongArray(Dest)[1] := {$IFNDEF ENDIAN_BIG}B1{$ELSE}SwapLong(B1){$ENDIF};
+  PLongArray(Dest)[2] := {$IFNDEF ENDIAN_BIG}B2{$ELSE}SwapLong(B2){$ENDIF};
+  PLongArray(Dest)[3] := {$IFNDEF ENDIAN_BIG}B3{$ELSE}SwapLong(B3){$ENDIF};
 end;
 {$ENDIF}
 
@@ -5082,6 +5186,9 @@ procedure TCipher_RC2.DoInit(const Key; Size: Integer);
 var
   I,L,Mask,KeyEffectiveBits: Integer;
   K: PByteArray;
+  {$IFDEF ENDIAN_BIG}
+  W: PWordArray;
+  {$ENDIF}
 begin
   if Size <= 0 then Exit;
   KeyEffectiveBits := Size * 8;
@@ -5096,6 +5203,11 @@ begin
   K[128 - L] := RC2_Data[K[128 - L] and Mask];
   for I := 127 - L downto 0 do
      K[I] := RC2_Data[K[I + 1] xor K[I + L]];
+  {$IFDEF ENDIAN_BIG}
+  W := @K[0];
+  for I := 0 to 63 do
+    W[I] := Swap(W[I]);
+  {$ENDIF}
 end;
 
 procedure TCipher_RC2.DoEncode(Source, Dest: Pointer; Size: Integer);
@@ -5107,10 +5219,10 @@ begin
   Assert(Size = Context.BufferSize);
 
   K := FUser;
-  A := PWordArray(Source)[0];
-  B := PWordArray(Source)[1];
-  C := PWordArray(Source)[2];
-  D := PWordArray(Source)[3];
+  A := {$IFNDEF ENDIAN_BIG}PWordArray(Source)[0]{$ELSE}Swap(PWordArray(Source)[0]){$ENDIF};
+  B := {$IFNDEF ENDIAN_BIG}PWordArray(Source)[1]{$ELSE}Swap(PWordArray(Source)[1]){$ENDIF};
+  C := {$IFNDEF ENDIAN_BIG}PWordArray(Source)[2]{$ELSE}Swap(PWordArray(Source)[2]){$ENDIF};
+  D := {$IFNDEF ENDIAN_BIG}PWordArray(Source)[3]{$ELSE}Swap(PWordArray(Source)[3]){$ENDIF};
   for I := 0 to 15 do
   begin
     Inc(A, (B and not D) + (C and D) + K[I * 4 +0]); A := A shl 1 or A shr 15;
@@ -5125,10 +5237,10 @@ begin
       Inc(D, K[C and $3F]);
     end;
   end;
-  PWordArray(Dest)[0] := A;
-  PWordArray(Dest)[1] := B;
-  PWordArray(Dest)[2] := C;
-  PWordArray(Dest)[3] := D;
+  PWordArray(Dest)[0] := {$IFNDEF ENDIAN_BIG}A{$ELSE}Swap(A){$ENDIF};
+  PWordArray(Dest)[1] := {$IFNDEF ENDIAN_BIG}B{$ELSE}Swap(B){$ENDIF};
+  PWordArray(Dest)[2] := {$IFNDEF ENDIAN_BIG}C{$ELSE}Swap(C){$ENDIF};
+  PWordArray(Dest)[3] := {$IFNDEF ENDIAN_BIG}D{$ELSE}Swap(D){$ENDIF};
 end;
 
 procedure TCipher_RC2.DoDecode(Source, Dest: Pointer; Size: Integer);
@@ -5140,10 +5252,10 @@ begin
   Assert(Size = Context.BlockSize);
 
   K := FUser;
-  A := PWordArray(Source)[0];
-  B := PWordArray(Source)[1];
-  C := PWordArray(Source)[2];
-  D := PWordArray(Source)[3];
+  A := {$IFNDEF ENDIAN_BIG}PWordArray(Source)[0]{$ELSE}Swap(PWordArray(Source)[0]){$ENDIF};
+  B := {$IFNDEF ENDIAN_BIG}PWordArray(Source)[1]{$ELSE}Swap(PWordArray(Source)[1]){$ENDIF};
+  C := {$IFNDEF ENDIAN_BIG}PWordArray(Source)[2]{$ELSE}Swap(PWordArray(Source)[2]){$ENDIF};
+  D := {$IFNDEF ENDIAN_BIG}PWordArray(Source)[3]{$ELSE}Swap(PWordArray(Source)[3]){$ENDIF};
   for I := 15 downto 0 do
   begin
     D := D shr 5 or D shl 11 - (A and not C) - (B and C) - K[I * 4 +3];
@@ -5158,10 +5270,10 @@ begin
       Dec(A, K[D and $3F]);
     end;
   end;
-  PWordArray(Dest)[0] := A;
-  PWordArray(Dest)[1] := B;
-  PWordArray(Dest)[2] := C;
-  PWordArray(Dest)[3] := D;
+  PWordArray(Dest)[0] := {$IFNDEF ENDIAN_BIG}A{$ELSE}Swap(A){$ENDIF};
+  PWordArray(Dest)[1] := {$IFNDEF ENDIAN_BIG}B{$ELSE}Swap(B){$ENDIF};
+  PWordArray(Dest)[2] := {$IFNDEF ENDIAN_BIG}C{$ELSE}Swap(C){$ENDIF};
+  PWordArray(Dest)[3] := {$IFNDEF ENDIAN_BIG}D{$ELSE}Swap(D){$ENDIF};
 end;
 
 // .TCipher_RC5
@@ -5195,6 +5307,9 @@ begin
   if FRounds <= 0 then FRounds := 12;
   FillChar(K, SizeOf(K), 0);
   Move(Key, K, Size);
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(K, K, 16);
+  {$ENDIF}
   D := FUser;
   L := (Size +3) shr 2;
   if L <= 0 then L := 1;
@@ -5235,15 +5350,15 @@ begin
   Assert(Size = Context.BufferSize);
 
   K := FUser;
-  A := PLongArray(Source)[0] + K[0];
-  B := PLongArray(Source)[1] + K[1];
+  A := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[0]{$ELSE}SwapLong(PLongArray(Source)[0]){$ENDIF} + K[0];
+  B := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[1]{$ELSE}SwapLong(PLongArray(Source)[1]){$ENDIF} + K[1];
   for I := 1 to FRounds do
   begin
     A := A xor B; A := A shl (B and 31) or A shr ((32 - B) and 31) + K[I * 2 +0];
     B := B xor A; B := B shl (A and 31) or B shr ((32 - A) and 31) + K[I * 2 +1];
   end;
-  PLongArray(Dest)[0] := A;
-  PLongArray(Dest)[1] := B;
+  PLongArray(Dest)[0] := {$IFNDEF ENDIAN_BIG}A{$ELSE}SwapLong(A){$ENDIF};
+  PLongArray(Dest)[1] := {$IFNDEF ENDIAN_BIG}B{$ELSE}SwapLong(B){$ENDIF};
 end;
 
 procedure TCipher_RC5.DoDecode(Source, Dest: Pointer; Size: Integer);
@@ -5255,15 +5370,15 @@ begin
   Assert(Size = Context.BufferSize);
 
   K := @PLongArray(FUser)[0];
-  A := PLongArray(Source)[0];
-  B := PLongArray(Source)[1];
+  A := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[0]{$ELSE}SwapLong(PLongArray(Source)[0]){$ENDIF};
+  B := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[1]{$ELSE}SwapLong(PLongArray(Source)[1]){$ENDIF};
   for I := FRounds downto 1 do
   begin
     B := B - K[I * 2 +1]; B := B shr (A and 31) or B shl ((32 - A) and 31) xor A;
     A := A - K[I * 2 +0]; A := A shr (B and 31) or A shl ((32 - B) and 31) xor B;
   end;
-  PLongArray(Dest)[0] := A - K[0];
-  PLongArray(Dest)[1] := B - K[1];
+  PLongArray(Dest)[0] := {$IFNDEF ENDIAN_BIG}A - K[0]{$ELSE}SwapLong(A - K[0]){$ENDIF};
+  PLongArray(Dest)[1] := {$IFNDEF ENDIAN_BIG}B - K[1]{$ELSE}SwapLong(B - K[1]){$ENDIF};
 end;
 
 // .TCipher_SAFER
@@ -5529,15 +5644,6 @@ begin
 end;
 
 // .TCipher_Shark
-type
-  PLong64 = ^TLong64;
-  TLong64  = packed record
-               L,R: LongWord;
-             end;
-
-  PLong64Array = ^TLong64Array;
-  TLong64Array = array[0..1023] of TLong64;
-
 class function TCipher_Shark.Context: TCipherContext;
 begin
   Result.KeySize := 16;
@@ -5546,6 +5652,16 @@ begin
   Result.UserSize := 112;
   Result.UserSave := False;
 end;
+
+{$IF NOT DEFINED(CPU64) AND NOT DEFINED(CPU64BITS) AND NOT DEFINED(ENDIAN_BIG)}
+type
+  PLong64 = ^TLong64;
+  TLong64  = packed record
+               L,R: LongWord;
+             end;
+
+  PLong64Array = ^TLong64Array;
+  TLong64Array = array[0..1023] of TLong64;
 
 procedure TCipher_Shark.DoInit(const Key; Size: Integer);
 var
@@ -5785,6 +5901,189 @@ begin
   PLong64(Dest).R := R xor K[13];
 end;
 
+{$ELSE} // 64-bit or Big Endian
+
+const
+  SHARK_ROUNDS = 6;
+  SHARK_ROUNDKEYS = SHARK_ROUNDS + 1;
+  SHARK_ROOT = $1F5; // GF(256) polynomial x^8 + x^7 + x^6 + x^5 + x^4 + x^2 + 1
+
+function SharkEncode(D: UInt64; K: PUInt64): UInt64;
+var
+  R: Integer;
+begin
+  for R := 1 to SHARK_ROUNDS - 1 do
+  begin
+    D := D xor K^;
+    Inc(K);
+    D := Shark_CE[0, D shr 56 and $FF] xor
+         Shark_CE[1, D shr 48 and $FF] xor
+         Shark_CE[2, D shr 40 and $FF] xor
+         Shark_CE[3, D shr 32 and $FF] xor
+         Shark_CE[4, D shr 24 and $FF] xor
+         Shark_CE[5, D shr 16 and $FF] xor
+         Shark_CE[6, D shr 8  and $FF] xor
+         Shark_CE[7, D        and $FF];
+  end;
+  D := D xor K^;
+  Inc(K);
+  D := UInt64(Shark_SE[D shr 56 and $FF]) shl 56 xor
+       UInt64(Shark_SE[D shr 48 and $FF]) shl 48 xor
+       UInt64(Shark_SE[D shr 40 and $FF]) shl 40 xor
+       UInt64(Shark_SE[D shr 32 and $FF]) shl 32 xor
+       UInt64(Shark_SE[D shr 24 and $FF]) shl 24 xor
+       UInt64(Shark_SE[D shr 16 and $FF]) shl 16 xor
+       UInt64(Shark_SE[D shr  8 and $FF]) shl  8 xor
+       UInt64(Shark_SE[D        and $FF]);
+  Result := D xor K^;
+end;
+
+procedure TCipher_Shark.DoInit(const Key; Size: Integer);
+var
+  Log, ALog: array[0..255] of Byte;
+
+  procedure InitLog;
+  var
+    I, J: Word;
+  begin
+    // Generate GF(256) anti-logarithm and logarithm tables
+    ALog[0] := 1;
+    for I := 1 to 255 do
+    begin
+      J := ALog[I - 1] shl 1;
+      if J and $100 <> 0 then
+        J := J xor SHARK_ROOT;
+      ALog[I] := J;
+    end;
+    Log[0] := 0;
+    Log[1] := 0;
+    for I := 1 to 254 do
+      Log[ALog[I]] := I;
+  end;
+
+  function Mul(A, B: Byte): Byte;
+  begin
+    // GF(256) multiplication via logarithm tables
+    Result := ALog[(Log[A] + Log[B]) mod 255];
+  end;
+
+  function Transform(A: UInt64): UInt64;
+  var
+    I, J: Integer;
+    K, T: array[0..7] of Byte;
+  begin
+    for I := 0 to 7 do
+      K[I] := A shr (56 - 8 * i);
+    for I := 0 to 7 do
+    begin
+      T[I] := Mul(Shark_I[I, 0], K[0]);
+      for J := 1 to 7 do
+        T[I] := T[I] xor Mul(Shark_I[I, J], K[J]);
+    end;
+    Result := T[0];
+    for I := 1 to 7 do
+      Result := (Result shl 8) xor T[I];
+  end;
+
+{$IFDEF FPC}{$push}{$warn 5057 off}{$ENDIF}
+var
+  T: array[0..SHARK_ROUNDS] of UInt64;
+  A: array[0..SHARK_ROUNDKEYS-1] of UInt64;
+  K: array[0..15] of Byte;
+  I, J, R: Integer;
+  E, D: PUInt64;
+begin
+  FillChar(K, SizeOf(K), 0);
+  Move(Key, K, Size);
+  InitLog;
+  E := FUser; // encryption round key
+  D := @E[SHARK_ROUNDS + 1]; // decryption round key
+
+  Move(Shark_CE[0], T, SizeOf(T));
+  T[SHARK_ROUNDS] := Transform(T[SHARK_ROUNDS]);
+
+  I := 0;
+  for R := 0 to High(A) do
+  begin
+    //Inc(I); // Wrong
+    A[R] := K[I and $F];
+    Inc(I);
+    for J := 1 to 7 do
+    begin
+      //Inc(I); // Wrong
+      A[R] := A[R] shl 8 or K[I and $F];
+      Inc(I);
+    end;
+  end;
+
+  E[0] := A[0] xor SharkEncode(0, @T);
+  for R := 1 to High(A) do
+    E[R] := A[R] xor SharkEncode(E[R - 1], @T);
+
+  E[SHARK_ROUNDS] := Transform(E[SHARK_ROUNDS]);
+  D[0] := E[SHARK_ROUNDS];
+  D[SHARK_ROUNDS] := E[0];
+  for R := 1 to SHARK_ROUNDS - 1 do
+    D[R] := Transform(E[SHARK_ROUNDS - R]);
+
+  ProtectBuffer(T, SizeOf(T));
+  ProtectBuffer(A, SizeOf(A));
+  ProtectBuffer(K, SizeOf(K));
+end;
+{$IFDEF FPC}{$pop}{$ENDIF}
+
+procedure TCipher_Shark.DoEncode(Source, Dest: Pointer; Size: Integer);
+begin
+  Assert(Size = Context.BufferSize);
+
+  PUInt64(Dest)^ := SharkEncode({$IFNDEF ENDIAN_BIG}PUInt64(Source)^{$ELSE}SwapInt64(PUInt64(Source)^){$ENDIF}, FUser);
+  {$IFDEF ENDIAN_BIG}
+  PUInt64(Dest)^ := SwapInt64(PUInt64(Dest)^);
+  {$ENDIF}
+end;
+
+procedure TCipher_Shark.DoDecode(Source, Dest: Pointer; Size: Integer);
+var
+  R: Integer;
+  D: UInt64;
+  K: PUInt64;
+begin
+  Assert(Size = Context.BufferSize);
+
+  D := {$IFNDEF ENDIAN_BIG}PUInt64(Source)^{$ELSE}SwapInt64(PUInt64(Source)^){$ENDIF};
+  K := @PUInt64(FUser)[SHARK_ROUNDS + 1]; // decryption round key
+  for R := 1 to SHARK_ROUNDS - 1 do
+  begin
+    D := D xor K^;
+    Inc(K);
+    D := Shark_CD[0, D shr 56 and $FF] xor
+         Shark_CD[1, D shr 48 and $FF] xor
+         Shark_CD[2, D shr 40 and $FF] xor
+         Shark_CD[3, D shr 32 and $FF] xor
+         Shark_CD[4, D shr 24 and $FF] xor
+         Shark_CD[5, D shr 16 and $FF] xor
+         Shark_CD[6, D shr 8  and $FF] xor
+         Shark_CD[7, D        and $FF];
+  end;
+  D := D xor K^;
+  Inc(K);
+  D := UInt64(Shark_SD[D shr 56 and $FF]) shl 56 xor
+       UInt64(Shark_SD[D shr 48 and $FF]) shl 48 xor
+       UInt64(Shark_SD[D shr 40 and $FF]) shl 40 xor
+       UInt64(Shark_SD[D shr 32 and $FF]) shl 32 xor
+       UInt64(Shark_SD[D shr 24 and $FF]) shl 24 xor
+       UInt64(Shark_SD[D shr 16 and $FF]) shl 16 xor
+       UInt64(Shark_SD[D shr  8 and $FF]) shl  8 xor
+       UInt64(Shark_SD[D        and $FF]);
+
+  PUInt64(Dest)^ := D xor K^;
+  {$IFDEF ENDIAN_BIG}
+  PUInt64(Dest)^ := SwapInt64(PUInt64(Dest)^);
+  {$ENDIF}
+end;
+
+{$IFEND}
+
 
 // .TCipher_Skipjack
 type
@@ -5831,10 +6130,10 @@ begin
   Min := FUser;
   Max := PAnsiChar(Min) + 9 * 256;
   Tab := Min;
-  A   := Swap(PWordArray(Source)[0]);
-  B   := Swap(PWordArray(Source)[1]);
-  C   := Swap(PWordArray(Source)[2]);
-  D   := Swap(PWordArray(Source)[3]);
+  A   := {$IFNDEF ENDIAN_BIG}Swap(PWordArray(Source)[0]){$ELSE}PWordArray(Source)[0]{$ENDIF};
+  B   := {$IFNDEF ENDIAN_BIG}Swap(PWordArray(Source)[1]){$ELSE}PWordArray(Source)[1]{$ENDIF};
+  C   := {$IFNDEF ENDIAN_BIG}Swap(PWordArray(Source)[2]){$ELSE}PWordArray(Source)[2]{$ENDIF};
+  D   := {$IFNDEF ENDIAN_BIG}Swap(PWordArray(Source)[3]){$ELSE}PWordArray(Source)[3]{$ENDIF};
   K   := 0;
   repeat
     Inc(K);
@@ -5884,10 +6183,10 @@ begin
     T := T xor Tab[T shr 8];           Inc(Tab); if PAnsiChar(Tab) > Max then Tab := Min;
     B := T;
   until K = 32;
-  PWordArray(Dest)[0] := Swap(Word(A));
-  PWordArray(Dest)[1] := Swap(Word(B));
-  PWordArray(Dest)[2] := Swap(Word(C));
-  PWordArray(Dest)[3] := Swap(Word(D));
+  PWordArray(Dest)[0] := {$IFNDEF ENDIAN_BIG}Swap(Word(A)){$ELSE}A{$ENDIF};
+  PWordArray(Dest)[1] := {$IFNDEF ENDIAN_BIG}Swap(Word(B)){$ELSE}B{$ENDIF};
+  PWordArray(Dest)[2] := {$IFNDEF ENDIAN_BIG}Swap(Word(C)){$ELSE}C{$ENDIF};
+  PWordArray(Dest)[3] := {$IFNDEF ENDIAN_BIG}Swap(Word(D)){$ELSE}D{$ENDIF};
 end;
 
 procedure TCipher_Skipjack.DoDecode(Source, Dest: Pointer; Size: Integer);
@@ -5901,10 +6200,10 @@ begin
   Min := FUser;
   Max := Pointer(Min + 9 * 256);
   Tab := Pointer(Min + 7 * 256);
-  A   := Swap(PWordArray(Source)[0]); {holds as Integer, Compiler make faster Code}
-  B   := Swap(PWordArray(Source)[1]);
-  C   := Swap(PWordArray(Source)[2]);
-  D   := Swap(PWordArray(Source)[3]);
+  A   := {$IFNDEF ENDIAN_BIG}Swap(PWordArray(Source)[0]){$ELSE}PWordArray(Source)[0]{$ENDIF};
+  B   := {$IFNDEF ENDIAN_BIG}Swap(PWordArray(Source)[1]){$ELSE}PWordArray(Source)[1]{$ENDIF};
+  C   := {$IFNDEF ENDIAN_BIG}Swap(PWordArray(Source)[2]){$ELSE}PWordArray(Source)[2]{$ENDIF};
+  D   := {$IFNDEF ENDIAN_BIG}Swap(PWordArray(Source)[3]){$ELSE}PWordArray(Source)[3]{$ENDIF};
   K   := 32;
   repeat
     T := B;
@@ -5954,10 +6253,10 @@ begin
     A := T;
     Dec(K);
   until K = 0;
-  PWordArray(Dest)[0] := Swap(Word(A));
-  PWordArray(Dest)[1] := Swap(Word(B));
-  PWordArray(Dest)[2] := Swap(Word(C));
-  PWordArray(Dest)[3] := Swap(Word(D));
+  PWordArray(Dest)[0] := {$IFNDEF ENDIAN_BIG}Swap(Word(A)){$ELSE}A{$ENDIF};
+  PWordArray(Dest)[1] := {$IFNDEF ENDIAN_BIG}Swap(Word(B)){$ELSE}B{$ENDIF};
+  PWordArray(Dest)[2] := {$IFNDEF ENDIAN_BIG}Swap(Word(C)){$ELSE}C{$ENDIF};
+  PWordArray(Dest)[3] := {$IFNDEF ENDIAN_BIG}Swap(Word(D)){$ELSE}D{$ENDIF};
 end;
 
 
@@ -5985,6 +6284,9 @@ end;
 procedure TCipher_TEA.DoInit(const Key; Size: Integer);
 begin
   Move(Key, FUser^, Size);
+  {$IFDEF ENDIAN_BIG}
+  SwapLongBuffer(FUser^, FUser^, 4);
+  {$ENDIF}
   SetRounds(FRounds);
 end;
 
@@ -6000,16 +6302,16 @@ begin
   B := PLongArray(FUser)[1];
   C := PLongArray(FUser)[2];
   D := PLongArray(FUser)[3];
-  X := PLongArray(Source)[0];
-  Y := PLongArray(Source)[1];
+  X := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[0]{$ELSE}SwapLong(PLongArray(Source)[0]){$ENDIF};
+  Y := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[1]{$ELSE}SwapLong(PLongArray(Source)[1]){$ENDIF};
   for I := 0 to FRounds -1 do
   begin
     Inc(Sum, TEA_Delta);
     Inc(X, (((Y shl 4 + A) xor Y) + Sum) xor (Y shr 5 + B));
     Inc(Y, (((X shl 4 + C) xor X) + Sum) xor (X shr 5 + D));
   end;
-  PLongArray(Dest)[0] := X;
-  PLongArray(Dest)[1] := Y;
+  PLongArray(Dest)[0] := {$IFNDEF ENDIAN_BIG}X{$ELSE}SwapLong(X){$ENDIF};
+  PLongArray(Dest)[1] := {$IFNDEF ENDIAN_BIG}Y{$ELSE}SwapLong(Y){$ENDIF};
 end;
 
 procedure TCipher_TEA.DoDecode(Source, Dest: Pointer; Size: Integer);
@@ -6024,16 +6326,16 @@ begin
   B := PLongArray(FUser)[1];
   C := PLongArray(FUser)[2];
   D := PLongArray(FUser)[3];
-  X := PLongArray(Source)[0];
-  Y := PLongArray(Source)[1];
+  X := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[0]{$ELSE}SwapLong(PLongArray(Source)[0]){$ENDIF};
+  Y := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[1]{$ELSE}SwapLong(PLongArray(Source)[1]){$ENDIF};
   for I := 0 to FRounds -1 do
   begin
     Dec(Y, (X shl 4 + C) xor X + Sum xor (X shr 5 + D));
     Dec(X, (Y shl 4 + A) xor Y + Sum xor (Y shr 5 + B));
     Dec(Sum, TEA_Delta);
   end;
-  PLongArray(Dest)[0] := X;
-  PLongArray(Dest)[1] := Y;
+  PLongArray(Dest)[0] := {$IFNDEF ENDIAN_BIG}X{$ELSE}SwapLong(X){$ENDIF};
+  PLongArray(Dest)[1] := {$IFNDEF ENDIAN_BIG}Y{$ELSE}SwapLong(Y){$ENDIF};
 end;
 
 // .TCipher_TEAN
@@ -6045,8 +6347,8 @@ begin
   Assert(Size = Context.BufferSize);
 
   Sum := 0;
-  X := PLongArray(Source)[0];
-  Y := PLongArray(Source)[1];
+  X := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[0]{$ELSE}SwapLong(PLongArray(Source)[0]){$ENDIF};
+  Y := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[1]{$ELSE}SwapLong(PLongArray(Source)[1]){$ENDIF};
   K := FUser;
   for I := 0 to FRounds -1 do
   begin
@@ -6054,8 +6356,8 @@ begin
     Inc(Sum, TEA_Delta);
     Inc(Y, (X shl 4 xor X shr 5) + (X xor Sum) + K[Sum shr 11 and 3]);
   end;
-  PLongArray(Dest)[0] := X;
-  PLongArray(Dest)[1] := Y;
+  PLongArray(Dest)[0] := {$IFNDEF ENDIAN_BIG}X{$ELSE}SwapLong(X){$ENDIF};
+  PLongArray(Dest)[1] := {$IFNDEF ENDIAN_BIG}Y{$ELSE}SwapLong(Y){$ENDIF};
 end;
 
 procedure TCipher_TEAN.DoDecode(Source, Dest: Pointer; Size: Integer);
@@ -6067,8 +6369,8 @@ begin
   Assert(Size = Context.BufferSize);
 
   Sum := TEA_Delta * LongWord(FRounds);
-  X := PLongArray(Source)[0];
-  Y := PLongArray(Source)[1];
+  X := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[0]{$ELSE}SwapLong(PLongArray(Source)[0]){$ENDIF};
+  Y := {$IFNDEF ENDIAN_BIG}PLongArray(Source)[1]{$ELSE}SwapLong(PLongArray(Source)[1]){$ENDIF};
   K := FUser;
   for I := 0 to FRounds -1 do
   begin
@@ -6076,8 +6378,8 @@ begin
     Dec(Sum, TEA_Delta);
     Dec(X, (Y shl 4 xor Y shr 5) + (Y xor Sum) + K[Sum and 3]);
   end;
-  PLongArray(Dest)[0] := X;
-  PLongArray(Dest)[1] := Y;
+  PLongArray(Dest)[0] := {$IFNDEF ENDIAN_BIG}X{$ELSE}SwapLong(X){$ENDIF};
+  PLongArray(Dest)[1] := {$IFNDEF ENDIAN_BIG}Y{$ELSE}SwapLong(Y){$ENDIF};
 end;
 
 end.

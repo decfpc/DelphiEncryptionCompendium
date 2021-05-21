@@ -5562,6 +5562,8 @@ var
       if J and $100 <> 0 then J := J xor $01F5;
       ALog[I] := J;
     end;
+    Log[0] := 0;
+    Log[1] := 0;
     for I := 1 to 254 do Log[ALog[I]] := I;
   end;
 
@@ -5657,14 +5659,14 @@ begin
   I := 0;
   for R := 0 to 6 do
   begin
-    Inc(I);
     A[R].L := K[I and $F];
     A[R].R := 0;
+    Inc(I);
     for J := 1 to 7 do
     begin
-      Inc(I);
       A[R].R := A[R].R shl 8 or A[R].L shr 24;
       A[R].L := A[R].L shl 8 or K[I and $F];
+      Inc(I);
     end;
   end;
   L.L := 0;

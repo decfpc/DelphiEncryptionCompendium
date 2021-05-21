@@ -5685,8 +5685,6 @@ begin
   D[6] := E[0];
   for R := 1 to 5 do
     D[R] := Transform(E[6-R]);
-  ProtectBuffer(Log, SizeOf(Log));
-  ProtectBuffer(ALog, SizeOf(ALog));
   ProtectBuffer(T, SizeOf(T));
   ProtectBuffer(A, SizeOf(A));
   ProtectBuffer(K, SizeOf(K));

@@ -58,6 +58,21 @@
 # Hash Algorithm Test Cases
 # 08.10.2003
 
+[THash_MD2]
+<8350e5a3e24c153df2275c9f80692773>=<>
+<32ec01ec4a6dac72c0ab96fb34c0b5d1>=<a>
+<da853b0d3f88d99b30283a69e6ded6bb>=<ab>,<c>
+<ab4f496bfb2a530b219ff33031fe06b0>=<message digest>
+<4e8ddff3650292ab5a4108c3aa47940b>=<abcdefghijklm>,<nopqrstuvwxyz>
+<da33def2a42df13975352846c30338cd>=<A>,<BCDEFGHIJKLMNOPQRS>,<TUVWXYZabcdefghijklmnopqrstuvwxyz012345678>,<9>
+<d5976f79d83d3a0dc9806c3c66f3efd8>=8<1234567890>
+<6cbc73836749b468e58289f601d6d9a3>=<This test vector intended to detect last zeroized block necessity decision error. This block has total length 119 bytes>
+<9d3b5f624375252a79e1e76d6f5ab41b>=<This test vector intended to detect last zeroized block necessity decision error. This block has total length 120 bytes.>
+# test repeated 15.625 times string aaa...
+<8c0a09ff1216ecaf95c8130953c62efd>=15625<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+# test one string of 15.625 times concatenation of aaa..., eg. 1Mb
+<8c0a09ff1216ecaf95c8130953c62efd>=15625!<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
+
 [THash_MD4]
 <31d6cfe0d16ae931b73c59d7e0c089c0>=<>
 <bde52cb31de33e46245e05fbdbd6fb24>=<a>
@@ -68,9 +83,7 @@
 <e33b4ddc9c38f2199c3e7b164fcc0536>=8<1234567890>
 <186767a4d851893b823e6824c6efda62>=<This test vector intended to detect last zeroized block necessity decision error. This block has total length 119 bytes>
 <adba72c3baf834d091eb59f18d022549>=<This test vector intended to detect last zeroized block necessity decision error. This block has total length 120 bytes.>
-# test repeated 15.625 times string aaa...
 <bbce80cc6bb65e5c6745e30d4eeca9a4>=15625<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
-# test one string of 15.625 times concatenation of aaa..., eg. 1Mb
 <bbce80cc6bb65e5c6745e30d4eeca9a4>=15625!<aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa>
 
 [THash_MD5]
@@ -456,6 +469,11 @@
 .Mode=cmCTSx
 <e81674f9bc69442188c949bb52e1e47874171177e99dbbe9880875094f8dfe21>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
 
+.Password=any16byteswilldo
+.IFiller=$FF
+.Mode=cmCTSx
+<5bc97ae801baa108cc55af692cde73cd>=<any16byteswilldo>
+
 [TCipher_IDEA]
 # DEC Version 3.0 Selftest Testvector
 .Password=TCipher_IDEA
@@ -502,13 +520,20 @@
 # DEC Version 3.0 Selftest Testvector
 .Password=TCipher_SCOP
 .IFiller=$FF
-.Mode=cmCTSx
-<4387128fa638d9f5f9c55cf4c2626228346269ddaebe0965133967bdd205ba3d>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+.Mode=cmECBx
+<ca29853fb7eec7f958931ff185c0b415c944c22f13e34423aba1a84fb3101f19>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
 
+# Test key with 'odd' bit being set
+.Password=TCipher_SCOPa
+.IFiller=$FF
+.Mode=cmECBx
+<18be1fff893de279b5768b21307c5c52436835c83ed5c96ea589884b61c69dc4>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+# Full length key
 .Password=TCipher_SCOPTCipher_SCOPTCipher_SCOPTCipher_SCOP
 .IFiller=$FF
-.Mode=cmCTSx
-<865e3a2088c015f6afa56363>=<12bytesbytes>
+.Mode=cmECBx
+<8dbc6579ac264ccfbb0f7aea>=<12bytesbytes>
 
 [TCipher_Sapphire]
 # DEC Version 3.0 Selftest Testvector
@@ -627,7 +652,12 @@
 .Password=TCipher_Shark
 .IFiller=$FF
 .Mode=cmCTSx
-<d96521aac0c384609dce1f8bfbab183fa121acf85349c06f273a8915d37ae90b>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+<170020effe055bfc4e23f1a56b6bd0393c7dddc6e424975f87338a89e8f418ab>=<\x30\x44\xED\x6E\x45\xA4\x96\xF5\xF6\x35\xA2\xEB\x3D\x1A\x5D\xD6\xCB\x1D\x09\x82\x2D\xBD\xF5\x60\xC2\xB8\x58\xA1\x91\xF9\x81\xB1>
+
+.Password=TCipher_Shark
+.IFiller=$FF
+.Mode=cmECBx
+<3968bf331e8ca5ed>=<\x00\x00\x00\x00\x00\x00\x00\x00>
 
 [TCipher_Skipjack]
 # DEC Version 3.0 Selftest Testvector

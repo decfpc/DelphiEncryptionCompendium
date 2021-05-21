@@ -3514,7 +3514,7 @@ begin
   end;
   GP8(@T);
   I := T[3] and $7F;
-  P[I + 3] := P[I + 3] or 1;
+  P[I] := P[I] or 1;
   P := FUser;
   P[0] := T[3] shr 24 and $FF;
   P[1] := T[3] shr 16 and $FF;

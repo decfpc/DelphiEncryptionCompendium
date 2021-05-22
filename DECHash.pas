@@ -491,7 +491,7 @@ procedure Increment8(var Value; Add: LongWord);
 asm
     MOV  ECX,EDX
     LEA  EDX,[EDX * 8]
-    SHR  ECX,25
+    SHR  ECX,29
     ADD  [EAX].DWord[ 0],EDX
     ADC  [EAX].DWord[ 4],ECX
     ADC  [EAX].DWord[ 8],0
@@ -511,7 +511,7 @@ begin
   A := V[0] + Add * 8;
   C := Ord(V[0] > A);
   V[0] := A;
-  A := V[1] + (Add shr 25) + C;
+  A := V[1] + (Add shr 29) + C;
   C := Ord(V[1] > A);
   V[1] := A;
   for i := 2 to 7 do

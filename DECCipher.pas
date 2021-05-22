@@ -498,6 +498,8 @@ type
     procedure DoDecode(Source, Dest: Pointer; Size: Integer); override;
   end;
 
+  TCipher_XTEA = TCipher_TEAN;
+
 function  ValidCipher(CipherClass: TDECCipherClass = nil): TDECCipherClass;
 function  CipherByName(const Name: String): TDECCipherClass;
 function  CipherByIdentity(Identity: LongWord): TDECCipherClass;
@@ -6274,9 +6276,12 @@ end;
 
 procedure TCipher_TEA.SetRounds(Value: Integer);
 begin
-  if not (FState in [csNew, csInitialized, csDone]) then Done;
-  if Value < 16 then Value := 16 else
-    if Value > 32 then Value := 32;
+  if not (FState in [csNew, csInitialized, csDone]) then
+    Done;
+  if Value < 16 then
+    Value := 16
+  else if Value > 256 then
+    Value := 256;
   FRounds := Value;
 end;
 
@@ -6351,9 +6356,9 @@ begin
   K := FUser;
   for I := 0 to FRounds -1 do
   begin
-    Inc(X, (Y shl 4 xor Y shr 5) + (Y xor Sum) + K[Sum and 3]);
+    Inc(X, ((Y shl 4 xor Y shr 5) + Y) xor (Sum + K[Sum and 3]));
     Inc(Sum, TEA_Delta);
-    Inc(Y, (X shl 4 xor X shr 5) + (X xor Sum) + K[Sum shr 11 and 3]);
+    Inc(Y, ((X shl 4 xor X shr 5) + X) xor (Sum + K[Sum shr 11 and 3]));
   end;
   PLongArray(Dest)[0] := {$IFNDEF ENDIAN_BIG}X{$ELSE}SwapLong(X){$ENDIF};
   PLongArray(Dest)[1] := {$IFNDEF ENDIAN_BIG}Y{$ELSE}SwapLong(Y){$ENDIF};
@@ -6373,9 +6378,9 @@ begin
   K := FUser;
   for I := 0 to FRounds -1 do
   begin
-    Dec(Y, (X shl 4 xor X shr 5) + (X xor Sum) + K[Sum shr 11 and 3]);
+    Dec(Y, ((X shl 4 xor X shr 5) + X) xor (Sum + K[Sum shr 11 and 3]));
     Dec(Sum, TEA_Delta);
-    Dec(X, (Y shl 4 xor Y shr 5) + (Y xor Sum) + K[Sum and 3]);
+    Dec(X, ((Y shl 4 xor Y shr 5) + Y) xor (Sum + K[Sum and 3]));
   end;
   PLongArray(Dest)[0] := {$IFNDEF ENDIAN_BIG}X{$ELSE}SwapLong(X){$ENDIF};
   PLongArray(Dest)[1] := {$IFNDEF ENDIAN_BIG}Y{$ELSE}SwapLong(Y){$ENDIF};

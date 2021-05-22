@@ -13,6 +13,9 @@ uses
   Windows,
   CPU,
   {$ENDIF}
+  {$IFDEF FPC}
+  EpikTimer,
+  {$ENDIF}
   SysUtils,
   TypInfo,
   DECCRC,
@@ -29,18 +32,6 @@ procedure RegisterClasses;
 begin
   RegisterDECClasses([TFormat_HEX, TFormat_HEXL, TFormat_MIME32, TFormat_MIME64,
                       TFormat_PGP, TFormat_UU, TFormat_XX, TFormat_ESCAPE]);
-
-// or even in single steps
-(*
-  TFormat_HEX.Register;
-  TFormat_HEXL.Register;
-  TFormat_MIME32.Register;
-  TFormat_MIME64.Register;
-  TFormat_PGP.Register;
-  TFormat_UU.Register;
-  TFormat_XX.Register;
-  TFormat_ESCAPE.Register;
-*)
 
 // preferred hashes
   THash_MD2.Register;        // 1.5Kb
@@ -340,8 +331,12 @@ begin
   Output := Format.Encode(Data);
 
   Write(FLineNo:5, ': ', Format.Classname, ' ');
-  if Test <> Output then WriteLn(Test, ' != ', Output)
-    else WriteLn('test ok.');
+  if Test <> Output then
+    WriteLn(Test, ' != ', Output)
+  else if Format.Decode(Output) <> Data then
+    Writeln('Decode FAILED: ', Format.Decode(Output), ' != ', Data)
+  else
+    WriteLn('test ok.');
 end;
 
 constructor TTestRunner.Create(const AFileName: string);
@@ -420,10 +415,10 @@ begin
   WriteLn;
 end;
 
-{$IFDEF MSWINDOWS}
 const
   HashBufferSize = 1024 * 16;
 
+{$IFDEF MSWINDOWS}
 function DoSpeedHash(Buffer: PByteArray; HashClass: TDECHashClass): Boolean;
 var
   Start,Stop: Int64;
@@ -457,19 +452,45 @@ begin
   end;
   Sleep(0);
 end;
+{$ELSE}
+function DoSpeedHash(Buffer: PByteArray; HashClass: TDECHashClass): Boolean;
+var
+  Timer: TEpikTimer;
+  I: Integer;
+begin
+  Result := False;
+  Timer := TEpikTimer.Create(nil);
+  with HashClass.Create do
+  try
+    Timer.Start;
+    for I := 0 to 15 do
+    begin
+      Init;
+      Calc(Buffer[0], HashBufferSize);
+      Done;
+    end;
+    Timer.Stop;
+    WriteLn(ClassName, StringOfChar(' ', 20 - Length(ClassName)), ': ',
+            (1/Timer.Elapsed/4):10:2, ' Mb/sec');
+  finally
+    Free;
+    Timer.Free;
+  end;
+end;
+{$ENDIF}
 
 procedure SpeedTestHashs;
 var
-  Buffer: String;
+  Buffer: Binary;
 begin
   WriteLn('compute hash performances');
   WriteLn;
+  Buffer := '';
   SetLength(Buffer, HashBufferSize);
   RandomBuffer(Buffer[1], HashBufferSize);
   DECEnumClasses(@DoSpeedHash, Pointer(Buffer), TDECHash);
   WriteLn;
 end;
-{$ENDIF}
 
 const
   TEST_VECTOR: array[0..39] of Byte = (
@@ -515,10 +536,10 @@ begin
   DECEnumClasses(@DoTestCipher, nil, TDECCipher);
 end;
 
-{$IFDEF MSWINDOWS}
 const
   CipherBufferSize = 1024 * 16 * 2;
 
+{$IFDEF MSWINDOWS}
 function DoSpeedCipher(Buffer: PByteArray; CipherClass: TDECCipherClass): Boolean;
 var
   Start,Stop: Int64;
@@ -560,6 +581,39 @@ begin
   end;
   Sleep(0);
 end;
+{$ELSE}
+function DoSpeedCipher(Buffer: PByteArray; CipherClass: TDECCipherClass): Boolean;
+var
+  Timer: TEpikTimer;
+  I, S: Integer;
+begin
+  Result := False;
+  Timer := TEpikTimer.Create(nil);
+  with CipherClass.Create do
+  try
+    Mode := cmECBx;
+    Init(StringOfChar('x', Context.KeySize));
+
+    S := CipherBufferSize shr 1;
+    I := S mod Context.BufferSize;
+    Dec(S, I);
+    Timer.Start;
+    for I := 0 to 7 do
+    begin
+      Encode(Buffer[0], Buffer[S], S);
+      Done;
+      Decode(Buffer[0], Buffer[S], S);
+      Done;
+    end;
+    Timer.Stop;
+    WriteLn(ClassName, StringOfChar(' ', 20 - Length(ClassName)), ': ',
+            (1/Timer.Elapsed/4):10:2, ' Mb/sec');
+  finally
+    Free;
+    Timer.Free;
+  end;
+end;
+{$ENDIF}
 
 procedure SpeedTestCiphers;
 var
@@ -567,12 +621,12 @@ var
 begin
   WriteLn('compute cipher performances');
   WriteLn;
+  Buffer := '';
   SetLength(Buffer, CipherBufferSize);
   RandomBuffer(Buffer[1], CipherBufferSize);
   DECEnumClasses(@DoSpeedCipher, Pointer(Buffer), TDECCipher);
   WriteLn;
 end;
-{$ENDIF}
 
 procedure DemoCipher(Index: Integer);
 // demonstrate en/decryption with cipher Blowfish and use of a
@@ -753,6 +807,13 @@ var
 begin
   WriteLn(#13#10'File En/Decryption test');
 
+  FileName := ChangeFileExt(ParamStr(0), '.test');
+  if not FileExists(FileName) then
+  begin
+    Writeln('Skipped (', FileName, ' does not exist)');
+    Exit;
+  end;
+
   SetDefaultCipherClass(TCipher_Rijndael);
   SetDefaultHashClass(THash_SHA1);
   // Set the base identity for the cipher/hash algorithms to an application specific value.
@@ -765,15 +826,15 @@ begin
   RegisterDECClasses([TCipher_Rijndael, THash_SHA1]);
   // The lines above should usually be executed during application startup.
 
-  FileName := ChangeFileExt(ParamStr(0), '.test');
   EncodeFile(FileName, 'Password');
   DecodeFile(FileName + '.enc', 'Password');
 end;
 
 begin
   RandomSeed; // randomize DEC's own RNG
-  AssignFile(Output, ChangeFileExt(ParamStr(0), '.txt'));
-  Rewrite(Output);
+  // Uncomment these two lines if the program output should be written to a text file instead of stdout
+  //AssignFile(Output, ChangeFileExt(ParamStr(0), '.txt'));
+  //Rewrite(Output);
   try
     RegisterClasses;
     PrintRegisteredClasses;
@@ -785,13 +846,13 @@ begin
         Free;
       end;
     end;
-    {$IFDEF MSWINDOWS}
+    {$IF DEFINED(MSWINDOWS) OR DEFINED(FPC)}
     SpeedTestHashs;
-    {$ENDIF}
+    {$IFEND}
     TestCipher;
-    {$IFDEF MSWINDOWS}
+    {$IF DEFINED(MSWINDOWS) OR DEFINED(FPC)}
     SpeedTestCiphers;
-    {$ENDIF}
+    {$IFEND}
 
     DemoCipher(0);
     DemoCipher(1);
@@ -799,8 +860,11 @@ begin
 
     DemoCipherFile;
   except
-    on E: Exception do WriteLn(E.Message);
+    on E: Exception do
+      WriteLn(E.Message);
   end;
-  //Readln;
+  {$IFDEF MSWINDOWS}
+  Readln;
+  {$ENDIF}
 end.
 

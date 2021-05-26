@@ -1,7 +1,7 @@
 {*****************************************************************************
 
   Delphi Encryption Compendium (DEC Part I)
-  Version 5.2, Part I, for Delphi 7 - 2009
+  Version 5.3 for Delphi 7 - 10.4 or higher/FPC 2.6 or higher
 
   Remarks:          Freeware, Copyright must be included
 

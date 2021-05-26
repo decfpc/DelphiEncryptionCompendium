@@ -1,4 +1,8 @@
  # Delphi Encryption Compendium
+
+ ## Note
+If you're looking to do cryptography in Pascal on ARM, PowerPC or other exotic platforms, you've come to the right place. If you're a Delphi user or want to use more modern ciphers and hash algorithms such as SHA-3, please take a look at the [official DEC repository](https://github.com/MHumm/DelphiEncryptionCompendium).
+
  ## Introduction
 The Delphi Encryption Compendium (DEC) is a cryptographic library for Delphi, C++ Builder and Free Pascal. It was originally developed by Hagen Reddmann, made compatible with Delphi 2009 by Arvid Winkelsdorf, and has now been ported to Free Pascal.
 

@@ -67,7 +67,8 @@ interface
 
 uses
 {$IFDEF Windows}
-  Windows, MMSystem,
+  Windows,
+  MMSystem,
 {$ELSE}
   unix, unixutil, baseunix,
   {$IFDEF LINUX}

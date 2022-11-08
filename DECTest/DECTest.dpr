@@ -23,6 +23,7 @@ uses
   DECFmt,
   DECHash,
   DECCipher,
+  DECccm,
   DECRandom,
   Variants; // Variants required for SetPropValue in FPC (else access violation when converting AnsiString to Variant)
 
@@ -123,6 +124,10 @@ type
     FPassword: Binary;
     FIV: Binary;
     FIFiller: Byte;
+    // CCM only props
+    FMIC : Binary;
+    FAttr: Binary;
+    Fq   : byte;
 
     procedure InvalidLine;
     function ExtractClassName: PAnsiChar;
@@ -132,6 +137,7 @@ type
     procedure TestHash;
     procedure TestCipher;
     procedure TestFormat;
+    procedure TestCCM;
   public
     constructor Create(const AFileName: string);
     destructor Destroy; override;
@@ -145,6 +151,7 @@ begin
 end;
 
 function TTestRunner.ExtractClassName: PAnsiChar;
+// \[(.*)\]
 begin
   while FCurChar^ in [' ', '['] do Inc(FCurChar);
   Result := FCurChar;
@@ -168,23 +175,32 @@ begin
     Inc(FCurChar);
     while FCurChar^ in ['=', ' '] do Inc(FCurChar);
     if Instance is TDECCipher then
-      if AnsiCompareText(PropName, 'Password') = 0 then
-      begin
+      if AnsiCompareText(PropName, 'Password') = 0 then begin
         FPassword := TFormat_Escape.Decode(FCurChar^, StrLen(FCurChar));
         with TDECCipher(Instance).Context do
           if Length(FPassword) > KeySize then SetLength(FPassword, KeySize);
         Exit;
-      end else
-        if AnsiCompareText(PropName, 'IV') = 0 then
-        begin
+      end
+      else if AnsiCompareText(PropName, 'IV') = 0 then  begin
           FIV := TFormat_Escape.Decode(FCurChar^, StrLen(FCurChar));
           Exit;
-        end else
-          if AnsiCompareText(PropName, 'IFiller') = 0 then
-          begin
+      end
+      else if AnsiCompareText(PropName, 'MIC') = 0 then begin
+            FMIC := TFormat_Escape.Decode(FCurChar^, StrLen(FCurChar));
+            Exit;
+      end
+      else if AnsiCompareText(PropName, 'A') = 0 then begin
+            FAttr := TFormat_Escape.Decode(FCurChar^, StrLen(FCurChar));
+            Exit;
+      end
+      else if AnsiCompareText(PropName, 'IFiller') = 0 then begin
             FIFiller := StrToInt(FCurChar);
             Exit;
-          end;
+      end
+      else if AnsiCompareText(PropName, 'Q') = 0 then begin
+            Fq := StrToInt(FCurChar);
+            Exit;
+      end;
     try
       SetPropValue(Instance, PropName, AnsiString(FCurChar));
     except
@@ -200,6 +216,7 @@ end;
 function TTestRunner.ExtractTestResult: Binary;
 // extract valid test result, and convertion from Escaped string
 // repositionate to testcases
+// <.*>=
 var
   R,P: PAnsiChar;
 begin
@@ -218,6 +235,7 @@ end;
 
 function TTestRunner.ExtractTest(out Data: Binary; out Count: Integer): Boolean;
 // extract one testcase and repetition
+// [(count)[!]]<.*>[>,]
 var
   L: Boolean;
   T: Binary;
@@ -279,8 +297,9 @@ begin
   Hash.Done;
 
   Write(FLineNo:5, ': ', Hash.Classname, ' ');
-  if AnsiCompareText(Hash.DigestStr(TFormat_HEXL), Digest) <> 0 then WriteLn(Digest, ' != ', Hash.DigestStr(TFormat_HEXL))
-    else WriteLn('test ok.');
+  if AnsiCompareText(Hash.DigestStr(TFormat_HEXL), Digest) <> 0 then
+     WriteLn(Digest, ' != ', Hash.DigestStr(TFormat_HEXL))
+  else WriteLn('test ok.');
 end;
 
 procedure TTestRunner.TestCipher;
@@ -316,6 +335,66 @@ begin
     Exit;
   end;
   WriteLn('test ok.');
+end;
+
+
+procedure TTestRunner.TestCCM;
+var
+  Cipher    : TDEC_CCM;
+  CipherText, PlainText, TestResult, PlainResult: Binary;
+  mic       : Binary=''; //array of byte;
+  count     : integer;
+begin
+  Cipher := TDEC_CCM(FInstance);
+
+  CipherText := ExtractTestResult;
+  Cipher.Init(FPassword, FIV, FIFiller);
+  TestResult := '';
+  PlainResult := '';
+
+  if not ExtractTest(PlainText, Count) then begin
+    WriteLn('ommit empty test');
+    Exit;
+  end;
+
+  PlainResult := PlainText;
+
+  setlength(mic, length(Fmic));
+  Cipher.mic_setup(FAttr[1], length(FAttr)
+                      , length(PlainText), length(mic)
+                      , Fq );
+  Cipher.mic_encode(PlainText[1], length(PlainText));
+  Cipher.mic_hash( mic[1], length(mic) );
+
+  TestResult  := Cipher.EncodeBinary(PlainText, TFormat_Copy);
+
+  if ExtractTest(PlainText, Count) then begin
+    WriteLn('ommit sequence: only signle test suppports');
+    Exit;
+  end;
+
+  Cipher.Done;
+  TestResult := TFormat_HEXL.Encode(TestResult);
+
+  Write(FLineNo:5, ': CCM ');
+  if CipherText <> TestResult then begin
+    WriteLn(CipherText, ' != ', TestResult);
+    Exit;
+  end;
+
+  if mic <> Fmic then begin
+    WriteLn('mic: ', TFormat_HEXL.Encode(mic), ' != ', TFormat_HEXL.Encode(Fmic));
+    Exit;
+  end;
+
+  Cipher.decode_setup(length(PlainResult), Fq);
+  TestResult := Cipher.DecodeBinary(TestResult, TFormat_HEXL);
+
+  if TestResult <> PlainResult then begin
+    WriteLn('decode error');
+    Exit;
+  end;
+
 end;
 
 procedure TTestRunner.TestFormat;
@@ -354,6 +433,7 @@ procedure TTestRunner.Run;
 var
   Line: AnsiString;
   TestProc: TTestProc;
+  test_name: AnsiString;
 begin
   WriteLn('processing test cases');
   WriteLn;
@@ -375,7 +455,19 @@ begin
              FClassType := nil;
              if FCurChar[1] <> '#' then
              try
-               FClassType := DECClassByName(ExtractClassName, TDECObject);
+               test_name := ExtractClassName();
+               if (test_name = 'CCM') then begin
+                 FPassword := '';
+                 FIV := '';
+                 FMIC := '';
+                 FAttr := '';
+                 FIFiller := 0;
+                 FInstance := TDEC_CCM.Create;
+                 TestProc := TestCCM;
+               end
+               else begin
+
+               FClassType := DECClassByName(test_name, TDECObject);
                if FClassType.InheritsFrom(TDECHash) then
                begin
                  FInstance := FClassType.Create;
@@ -393,6 +485,8 @@ begin
                      FInstance := FClassType.Create;
                      TestProc := TestCipher;
                    end;
+
+               end; // else if (test_name = 'CCM')
              except
                on E: Exception do
                begin

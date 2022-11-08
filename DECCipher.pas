@@ -131,12 +131,12 @@ type
 
   TDECCipher = class(TDECObject)
   private
-    FState: TCipherState;
     FMode: TCipherMode;
     FData: PByteArray;
     FDataSize: Integer;
     procedure SetMode(Value: TCipherMode);
   protected
+    FState: TCipherState;
     FBufferSize: Integer;
     FBufferIndex: Integer;
     FUserSize: Integer;
@@ -177,7 +177,10 @@ type
 
     property InitVectorSize: Integer read FBufferSize;
     property InitVector: PByteArray read FVector; // buffer size bytes
-    property Feedback: PByteArray read FFeedback; // buffer size bytes
+    property IVSize  : Integer      read FBufferSize;
+    property IV      : PByteArray   read FVector; // buffer size bytes
+
+    property Feedback  : PByteArray read FFeedback;  // buffer size bytes
 
     property State: TCipherState read FState;
   published
@@ -273,6 +276,8 @@ type
   published
     property Rounds: Integer read FRounds;
   end;
+
+  TCipher_AES = TCipher_Rijndael;
 
   TCipher_Square = class(TDECCipher)
   protected

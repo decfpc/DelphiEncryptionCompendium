@@ -24,6 +24,7 @@ uses
   DECHash,
   DECCipher,
   DECccm,
+  DECKW,
   DECRandom,
   Variants; // Variants required for SetPropValue in FPC (else access violation when converting AnsiString to Variant)
 
@@ -138,6 +139,7 @@ type
     procedure TestCipher;
     procedure TestFormat;
     procedure TestCCM;
+    procedure TestKW;
   public
     constructor Create(const AFileName: string);
     destructor Destroy; override;
@@ -411,6 +413,66 @@ begin
     Exit;
   end;
 
+  WriteLn('test ok');
+end;
+
+procedure TTestRunner.TestKW;
+var
+  CipherText,PlainText,TestResult,PlainResult: Binary;
+  Cipher: TDEC_KW;
+  Count: Integer;
+  len    : word;
+begin
+  Cipher := TDEC_KW(FInstance);
+  CipherText := ExtractTestResult;
+  Cipher.Init(FPassword, FIV, FIFiller);
+  TestResult := '';
+  PlainResult := '';
+
+  if not ExtractTest(PlainText, Count) then begin
+    WriteLn('ommit empty test');
+    Exit;
+  end;
+
+  PlainResult := PlainText;
+
+  setlength(TestResult, length(PlainText)+8);
+  len := cipher.wrap(PlainText[1], length(PlainText), TestResult[1]);
+
+  if (len <> length(TestResult)) then begin
+    WriteLn('wraped len=', len , ' expected:', length(TestResult));
+    Exit;
+  end;
+
+  if ExtractTest(PlainText, Count) then begin
+    WriteLn('ommit sequence: only signle test suppports');
+    Exit;
+  end;
+
+  Cipher.Done;
+  TestResult := TFormat_HEXL.Encode(TestResult);
+
+  Write(FLineNo:5, ': KW ');
+  if CipherText <> TestResult then
+  begin
+    WriteLn(CipherText, ' != ', TestResult);
+    Exit;
+  end;
+
+  TestResult := TFormat_HEXL.Decode(TestResult);
+  len := cipher.unwrap(TestResult[1], length(TestResult), TestResult[1]);
+  if (len <> length(TestResult)-8) then begin
+    WriteLn('wraped len=', len , ' expected:', length(TestResult)-8);
+    Exit;
+  end;
+  setlength(TestResult, len);
+
+  if TestResult <> PlainResult then
+  begin
+    WriteLn('decode error');
+    Exit;
+  end;
+  WriteLn('test ok.');
 end;
 
 procedure TTestRunner.TestFormat;
@@ -481,7 +543,15 @@ begin
                  FInstance := TDEC_CCM.Create;
                  TestProc := TestCCM;
                end
+               else if (test_name = 'KW') then begin
+                 FPassword := '';
+                 FIV := '';
+                 FIFiller := 0;
+                 FInstance := TDEC_KW.Create;
+                 TestProc := TestKW;
+               end
                else begin
+
 
                FClassType := DECClassByName(test_name, TDECObject);
                if FClassType.InheritsFrom(TDECHash) then

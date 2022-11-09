@@ -17,7 +17,7 @@ uses
   EpikTimer,
   {$ENDIF}
   SysUtils,
-  TypInfo,
+  TypInfo, Character,
   DECCRC,
   DECUtil,
   DECFmt,
@@ -216,21 +216,37 @@ end;
 function TTestRunner.ExtractTestResult: Binary;
 // extract valid test result, and convertion from Escaped string
 // repositionate to testcases
-// <.*>=
+// (\<.*\>)+=
 var
   R,P: PAnsiChar;
 begin
-  while FCurChar^ in [' ', '<'] do Inc(FCurChar);
+  Result := '';
+
+  repeat
+
+  while IsSeparator(FCurChar^) do Inc(FCurChar);
+  if FCurChar^ <> '<' then InvalidLine;
+  Inc(FCurChar);
+
   R := FCurChar;
   while not (FCurChar^ in [#0, '>']) do Inc(FCurChar);
   if FCurChar^ <> '>' then InvalidLine;
-  P := FCurChar;
-  while P^ in ['>', ' '] do Inc(P);
-  if P^ <> '=' then InvalidLine;
+
   FCurChar^ := #0;
+  inc(FCurChar);
+
+  Result := Result + TFormat_Escape.Decode(R^, StrLen(R));
+
+  while FCurChar^ in ['>', ' '] do Inc(P);
+
+  until not (FCurChar^ in ['<']);
+  P := FCurChar;
+
+  if P^ <> '=' then InvalidLine;
+
+
   while P^ in ['=', ' ', '>'] do Inc(P);
   FCurChar := P;
-  Result := TFormat_Escape.Decode(R^, StrLen(R));
 end;
 
 function TTestRunner.ExtractTest(out Data: Binary; out Count: Integer): Boolean;

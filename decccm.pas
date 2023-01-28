@@ -40,6 +40,8 @@ type
   }
   TDEC_CCM = class(TCipher_AES)
   public
+
+    // @value q = 0 - adjust counter width enough for dsize
     procedure mic_setup( const attr; asize : word ;
                              dsize: LongWord;
                              msize: byte;
@@ -47,10 +49,21 @@ type
                              );
 
     procedure mic_encode(var data; dsize: LongWord );
+	
+	/// @brief produce MIC of encoded data, and prepare chiper for data 
+	///		encode as CCM specified - CTR-mode coding
     procedure mic_hash(var mic; msize: byte );
 
+	/// @brief prepare chiper for data decode as CCM specified - CTR-mode coding
+    // @value q = 0 - adjust counter width enough for dsize
     procedure decode_setup(dsize: word; q : byte = 0       // counter bytes
                                     );
+
+    // @arg qw - counter width
+    function  ccm_counter_width(dsize: LongWord ) : word;
+	// @brief make IV proposed by CCM for data encription - a CTR-mode IV
+    procedure ccmiv_counter(var ctriv; cnt: LongWord; qw : byte );
+    function  ccmiv_counter(cnt: LongWord; qw : byte ) : TBytes;
 
     protected
       // @brief - copy tmp <- last key-sized data block
@@ -66,7 +79,7 @@ resourcestring
   sMICSizeInvalid = 'MIC-size invalid';
   sCTRSizeInvalid = 'CCM: counter size must <= 8';
 
-function len_bytes( dsize: word ) : byte;
+function len_bytes( dsize: LongWord ) : byte;
 const    BLOCK_SIZE : word = 16;
 var      q: byte;
 begin
@@ -291,6 +304,35 @@ begin
     FillByte( tmp[result], rest, 0);
 end;
 
+// @arg qw - counter width
+function  TDEC_CCM.ccm_counter_width(dsize: LongWord ) : word;
+begin
+  result := len_bytes(dsize);
+end;
+
+function  TDEC_CCM.ccmiv_counter(cnt: LongWord; qw : byte ) : TBytes;
+begin
+  setLength(result, IVSize );
+  ccmiv_counter( result[0], qw );
+end;
+
+procedure TDEC_CCM.ccmiv_counter(var ctriv; cnt: LongWord; qw : byte );
+var
+  ksize : byte;
+  ivb : PByteArray;
+begin
+  ksize := IVSize;
+  move(IV[0], ctriv, ksize);
+  ivb := PByteArray(@ctriv);
+
+  ivb[0] := qw-1;
+  FillByte( ivb[ksize-qw], qw, 0);
+  cnt := SwapLong(cnt+1);
+
+  if (qw > sizeof(cnt)) then
+     qw := sizeof(cnt);
+  move( cnt, ivb[ksize-qw], qw);
+end;
 
 end.
 

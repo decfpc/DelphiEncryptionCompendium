@@ -56,7 +56,7 @@ type
 
 	/// @brief prepare chiper for data decode as CCM specified - CTR-mode coding
     // @value q = 0 - adjust counter width enough for dsize
-    procedure decode_setup(dsize: word; q : byte = 0       // counter bytes
+    procedure decode_setup(dsize: LongWord; q : byte = 0       // counter bytes
                                     );
 
     // @arg qw - counter width
@@ -69,7 +69,7 @@ type
       // @brief - copy tmp <- last key-sized data block
       // @return 0 - sz aligned to key-block size
       // @return > 0 - size of last data key-sized block
-      function pad_zero(var dst; const data; sz : word) : word;
+      function pad_zero(var dst; const data; sz : LongWord) : word;
   end;
 
 implementation
@@ -200,7 +200,7 @@ var
   tmp: TBytes = [];
   sz : LongWord;
 
-  function aligned_sz(sz : word) : word;
+  function aligned_sz(sz : LongWord) : LongWord;
   begin
       result := sz and not (IVSize-1);
   end;
@@ -248,7 +248,7 @@ begin
 end;
 
 
-procedure TDEC_CCM.decode_setup(dsize: word; q : byte = 0       // counter bytes
+procedure TDEC_CCM.decode_setup(dsize: LongWord; q : byte = 0       // counter bytes
                          );
 var
   ksize: byte;
@@ -276,16 +276,16 @@ begin
 end;
 
 // @result tmp[0] <= padded rest of last aligned block
-function TDEC_CCM.pad_zero(var dst; const data; sz : word) : word;
+function TDEC_CCM.pad_zero(var dst; const data; sz : LongWord) : word;
 var
   d   : PByteArray;
   tmp : PByteArray;
-  rest: word;
+  rest: LongWord;
   ksize: byte;
 
-  function aligned_sz(sz : word) : word;
+  function aligned_sz(sz : LongWord) : Longword;
   begin
-      result := sz and not (ksize-1);
+      result := sz and not LongWord(ksize-1);
   end;
 
 begin

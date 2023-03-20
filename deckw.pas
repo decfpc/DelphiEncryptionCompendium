@@ -126,7 +126,7 @@ begin
     s := PByteArray(@source);
     d := PByteArray(@dest);
     move(s[0], ba[0], 8);
-    move(s[8], d[0], DataSize);
+    move(s[8], d[0], DataSize-8);
 
     for j := 5 downto 0 do begin
       t := n*j;

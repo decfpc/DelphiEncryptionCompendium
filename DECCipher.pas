@@ -5986,6 +5986,8 @@ var
       Result := (Result shl 8) xor T[I];
   end;
 
+{$POINTERMATH ON}
+
 {$IFDEF FPC}{$push}{$warn 5057 off}{$ENDIF}
 var
   T: array[0..SHARK_ROUNDS] of UInt64;

@@ -105,7 +105,7 @@ procedure FoldStr(var Dest; DestSize: Integer; const Source: String);
 // Random Buffer/Binary, ATTENTION: standard Random function isn't
 // cryptographically secure, please include DECRandom to install secure PRNG
 function RandomBinary(Size: Integer): Binary;
-procedure RandomBuffer(var Buffer; Size: Integer);
+procedure RandomBuffer(out Buffer; Size: Integer);
 function RandomLong: LongWord;
 procedure RandomSeed(const Buffer; Size: Integer); overload;
 procedure RandomSeed; overload;
@@ -118,7 +118,7 @@ procedure SwapLongBuffer(const Source; out Dest; Count: Integer);
 function SwapInt64(const Value: Int64): Int64;
 procedure SwapInt64Buffer(const Source; var Dest; Count: Integer);
 function SwapBits(Value, Bits: LongWord): LongWord;
-procedure XORBuffers(const Source1, Source2; Size: Integer; var Dest);
+procedure XORBuffers(const Source1, Source2; Size: Integer; out Dest);
 
 // safer test if AObject is valid
 function IsObject(AObject: Pointer; AClass: TClass): Boolean; {$IFDEF FPC}inline;{$ENDIF}
@@ -361,7 +361,7 @@ asm //equal to StrLComp(P1, P2, Size), but always Size Bytes are checked
        POP     ESI
 end;}
 
-procedure XORBuffers(const Source1, Source2; Size: Integer; var Dest);
+procedure XORBuffers(const Source1, Source2; Size: Integer; out Dest);
 {$IFDEF UseASM86}
 asm // Dest^ =  Source1^ xor Source2^ , Size bytes
        AND   ECX,ECX
@@ -537,7 +537,7 @@ end;
 var
   FRndSeed: Cardinal = 0;
 
-function DoRndBuffer(Seed: Cardinal; var Buffer; Size: Integer): Cardinal;
+function DoRndBuffer(Seed: Cardinal; out Buffer; Size: Integer): Cardinal;
 {$IFDEF UseASM86}
 // same as Borlands Random
 asm
@@ -638,7 +638,7 @@ begin
   RandomBuffer(Result[1], Size);
 end;
 
-procedure RandomBuffer(var Buffer; Size: Integer);
+procedure RandomBuffer(out Buffer; Size: Integer);
 begin
   if Assigned(DoRandomBuffer) then DoRandomBuffer(Buffer, Size)
     else FRndSeed := DoRndBuffer(FRndSeed, Buffer, Size);

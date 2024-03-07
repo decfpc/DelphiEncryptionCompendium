@@ -51,6 +51,8 @@ The original DEC also contained the units ASN1 and TypeInfoEx - those are not re
  * Mars
  * RC2, RC4, RC5, RC6
  * Rijndael / AES
+ * AES-CCM  (RFC 3610 - Counter with CBC-MAC)
+ * AES-KW  (RFC 3394 Key Wrapping )
  * Square
  * SCOP
  * Sapphire
@@ -74,6 +76,7 @@ The original DEC also contained the units ASN1 and TypeInfoEx - those are not re
  * OFBx
  * CFSx
  * ECBx
+ * CTR2, CTR4 (2/4 byte counter mode)
  
 Check DECCipher.pas for more details on these modes.
 

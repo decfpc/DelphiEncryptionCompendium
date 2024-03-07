@@ -8,7 +8,7 @@ unit DEC;
 interface
 
 uses
-  CPU, DECCipher, DECCRC, DECData, DECFmt, DECHash, DECRandom, DECUtil, 
+  DECCPU, DECCipher, DECCRC, DECData, DECFmt, DECHash, DECRandom, DECUtil, 
   LazarusPackageIntf;
 
 implementation

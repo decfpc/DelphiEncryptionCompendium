@@ -15,8 +15,8 @@
     </CompilerOptions>
     <Files>
       <Item>
-        <Filename Value="..\..\CPU.pas"/>
-        <UnitName Value="CPU"/>
+        <Filename Value="..\..\DECCPU.pas"/>
+        <UnitName Value="DECCPU"/>
       </Item>
       <Item>
         <Filename Value="..\..\DECCipher.pas"/>

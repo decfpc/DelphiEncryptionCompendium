@@ -10,8 +10,8 @@ program DECTest;
 uses
   Classes,
   {$IFDEF MSWINDOWS}
-  Windows,
   DECCPU,
+  windows,
   {$ENDIF}
   {$IFDEF FPC}
   EpikTimer,

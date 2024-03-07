@@ -33,13 +33,21 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
+    <Units Count="2">
+      <Unit0>
+        <Filename Value="DECTest.dpr"/>
+        <IsPartOfProject Value="True"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="epiktimer.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="EpikTimer"/>
+      </Unit1>
+    </Units>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>
     <PathDelim Value="\"/>
-    <Target>
-      <Filename Value="$Path($(ProjFile))\DECTest"/>
-    </Target>
     <SearchPaths>
       <IncludeFiles Value="..;$(ProjOutDir)"/>
       <Libraries Value=".."/>
@@ -54,6 +62,19 @@
         <IncludeAssertionCode Value="True"/>
       </SyntaxOptions>
     </Parsing>
+    <Linking>
+      <Debugging>
+        <DebugInfoType Value="dsDwarf3"/>
+      </Debugging>
+      <Options>
+        <Win32>
+          <GraphicApplication Value="True"/>
+        </Win32>
+      </Options>
+    </Linking>
+    <Other>
+      <CustomOptions Value="-dBorland -dVer150 -dDelphi7 -dCompiler6_Up -dPUREPASCAL"/>
+    </Other>
   </CompilerOptions>
   <Debugging>
     <Exceptions Count="3">

@@ -11,7 +11,7 @@ uses
   Classes,
   {$IFDEF MSWINDOWS}
   Windows,
-  CPU,
+  DECCPU,
   {$ENDIF}
   {$IFDEF FPC}
   EpikTimer,
@@ -434,14 +434,14 @@ begin
     SetPriorityClass(GetCurrentProcess, REALTIME_PRIORITY_CLASS);
     SetThreadPriority(GetCurrentThread, THREAD_PRIORITY_TIME_CRITICAL);
     Sleep(0);
-    Start := CPU.RDTSC;
+    Start := DECCPU.RDTSC;
     for I := 0 to 4 do
     begin
       Init;
       Calc(Buffer[0], HashBufferSize);
       Done;
     end;
-    Stop := (CPU.RDTSC - Start) div 5;
+    Stop := (DECCPU.RDTSC - Start) div 5;
     WriteLn(ClassName, StringOfChar(' ', 20 - Length(ClassName)), ': ',
             Stop/HashBufferSize:10:1, ' cycles/byte ',
             CPUSpeed/Stop*HashBufferSize:10:2, ' Mb/sec');
@@ -562,7 +562,7 @@ begin
     SetPriorityClass(GetCurrentProcess, REALTIME_PRIORITY_CLASS);
     SetThreadPriority(GetCurrentThread, THREAD_PRIORITY_TIME_CRITICAL);
     Sleep(0);
-    Start := CPU.RDTSC;
+    Start := DECCPU.RDTSC;
     for I := 0 to 2 do
     begin
       Encode(Buffer[0], Buffer[S], S);
@@ -570,7 +570,7 @@ begin
       Decode(Buffer[0], Buffer[S], S);
       Done;
     end;
-    Stop := (CPU.RDTSC - Start) div 6;
+    Stop := (DECCPU.RDTSC - Start) div 6;
     WriteLn(ClassName, StringOfChar(' ', 20 - Length(ClassName)), ': ',
             Stop/S:10:1, ' cycles/byte ',
             CPUSpeed/Stop*S:10:2, ' Mb/sec');

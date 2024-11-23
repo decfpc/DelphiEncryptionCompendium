@@ -29,7 +29,10 @@ unit DECCPU;
 
 interface
 
-{$IFDEF MSWINDOWS}
+{$IF DEFINED(MSWINDOWS) AND (DEFINED(CPU386) OR DEFINED(CPUX64) OR DEFINED(CPUX86_64))}
+{$IFDEF FPC}
+  {$asmMode intel}
+{$ENDIF}
 type
   {CPU Detection}
   TCPUData = packed record

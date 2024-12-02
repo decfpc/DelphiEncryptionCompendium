@@ -91,7 +91,9 @@ type
                   identical to csInitialized, except Cipher.Buffer holds the encrypted
                   last state of Cipher.Feedback, thus Cipher.Buffer can be used as C-MAC.}
 
-  TCipherMode = (cmCTSx, cmCBCx, cmCFB8, cmCFBx, cmOFB8, cmOFBx, cmCFS8, cmCFSx, cmECBx);
+  TCipherMode = (cmCTSx, cmCBCx, cmCFB8, cmCFBx, cmOFB8, cmOFBx, cmCFS8, cmCFSx, cmECBx
+              , cmCTR2, cmCTR4
+              );
 { cmCTSx = double CBC, with CFS8 padding of truncated final block
   cmCBCx = Cipher Block Chainung, with CFB8 padding of truncated final block
   cmCFB8 = 8bit Cipher Feedback mode
@@ -101,6 +103,7 @@ type
   cmCFS8 = 8Bit CFS, double CFB
   cmCFSx = CFS on Blocksize bytes
   cmECBx = Electronic Code Book
+  cmCTRn = counter mode with n-byte counter at last IV bytes
 
   Modes cmCBCx, cmCTSx, cmCFBx, cmOFBx, cmCFSx, cmECBx working on Blocks of
   Cipher.BufferSize bytes, on Blockcipher that's equal to Cipher.BlockSize.
@@ -128,12 +131,12 @@ type
 
   TDECCipher = class(TDECObject)
   private
-    FState: TCipherState;
     FMode: TCipherMode;
     FData: PByteArray;
     FDataSize: Integer;
     procedure SetMode(Value: TCipherMode);
   protected
+    FState: TCipherState;
     FBufferSize: Integer;
     FBufferIndex: Integer;
     FUserSize: Integer;
@@ -146,6 +149,9 @@ type
     procedure DoInit(const Key; Size: Integer); virtual; abstract;
     procedure DoEncode(Source, Dest: Pointer; Size: Integer); virtual; abstract;
     procedure DoDecode(Source, Dest: Pointer; Size: Integer); virtual; abstract;
+
+    // @arg Size - last unaligned block encoded as is - rest of block not aligned
+    procedure EncodeCTR(S,D: PByteArray; Size: Integer; cnt_sz: Integer);
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -171,7 +177,10 @@ type
 
     property InitVectorSize: Integer read FBufferSize;
     property InitVector: PByteArray read FVector; // buffer size bytes
-    property Feedback: PByteArray read FFeedback; // buffer size bytes
+    property IVSize  : Integer      read FBufferSize;
+    property IV      : PByteArray   read FVector; // buffer size bytes
+
+    property Feedback  : PByteArray read FFeedback;  // buffer size bytes
 
     property State: TCipherState read FState;
   published
@@ -267,6 +276,8 @@ type
   published
     property Rounds: Integer read FRounds;
   end;
+
+  TCipher_AES = TCipher_Rijndael;
 
   TCipher_Square = class(TDECCipher)
   protected
@@ -906,6 +917,8 @@ begin
   case FMode of
     cmECBx: EncodeECBx(@Source, @Dest, DataSize);
     cmCBCx: EncodeCBCx(@Source, @Dest, DataSize);
+    cmCTR2: EncodeCTR (@Source, @Dest, DataSize, 2);
+    cmCTR4: EncodeCTR (@Source, @Dest, DataSize, 4);
     cmCTSx: EncodeCTSx(@Source, @Dest, DataSize);
     cmCFB8: EncodeCFB8(@Source, @Dest, DataSize);
     cmCFBx: EncodeCFBx(@Source, @Dest, DataSize);
@@ -915,6 +928,42 @@ begin
     cmCFSx: EncodeCFSx(@Source, @Dest, DataSize);
   end;
 end;
+
+procedure TDECCipher.EncodeCTR(S,D: PByteArray; Size: Integer; cnt_sz: Integer);
+var
+  I: Integer;
+
+  procedure ctr_next(cnt_sz: Integer);
+  var
+    pos : byte;
+  begin
+      for pos := FBufferSize-1 downto FBufferSize-1-cnt_sz do begin
+          inc( FFeedback[pos] );
+          if (FFeedback[pos] <> 0) then
+             exit;
+      end;
+  end;
+
+begin
+    I := 0;
+    while (I + FBufferSize) <= Size do begin
+      DoEncode(@FFeedback[0], FBuffer, FBufferSize);
+      XORBuffers(S[I], FBuffer[0], FBufferSize, D[I]);
+      ctr_next( cnt_sz );
+      Inc(I, FBufferSize);
+    end;
+
+    Dec(Size, I);
+    if Size > 0 then begin  // padding
+      DoEncode(@FFeedback[0], FBuffer, FBufferSize);
+      XORBuffers(S[I], FBuffer[0], Size, D[I]);
+      ctr_next( cnt_sz );
+      FState := csPadded;
+    end
+    else FState := csEncode;
+end;
+
+
 
 procedure TDECCipher.Decode(const Source; var Dest; DataSize: Integer);
 
@@ -1199,6 +1248,8 @@ begin
   case FMode of
     cmECBx: DecodeECBx(@Source, @Dest, DataSize);
     cmCBCx: DecodeCBCx(@Source, @Dest, DataSize);
+    cmCTR2: EncodeCTR (@Source, @Dest, DataSize, 2);
+    cmCTR4: EncodeCTR (@Source, @Dest, DataSize, 4);
     cmCTSx: DecodeCTSx(@Source, @Dest, DataSize);
     cmCFB8: DecodeCFB8(@Source, @Dest, DataSize);
     cmCFBx: DecodeCFBx(@Source, @Dest, DataSize);
